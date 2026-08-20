@@ -1,0 +1,6 @@
+{
+  "name": "Cloakroom",
+  "description": "Ariya Thangam Fancy Dress Rental System with date-aware costume rotation, advance pre-booking, refundable deposit calculations, customer handover records, and database backups.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
