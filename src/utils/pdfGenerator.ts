@@ -4,7 +4,7 @@ import { Rental } from '../types';
 import { getRentalComputedStatus } from './storage';
 
 // Helper to format currency cleanly using standard ASCII (Rs.) so jsPDF standard fonts render without broken Unicode symbols
-const formatCurrency = (amount: number) => `Rs. ${amount.toLocaleString('en-IN')}`;
+const formatCurrency = (amountInPaise: number) => `Rs. ${(amountInPaise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`;
 
 /**
  * Generate a clean, professional PDF Invoice / Receipt for an individual rental ticket.
@@ -26,48 +26,48 @@ export function generateRentalInvoicePDF(rental: Rental) {
     : 'ACTIVE RENTAL';
 
   // --- Header Styling (Dark Navy Theme) ---
-  doc.setFillColor(15, 23, 42); // slate-900 / dark blue
-  doc.rect(0, 0, 210, 38, 'F');
+  doc.setDrawColor(0, 0, 0);
+  doc.rect(0, 0, 210, 38, 'S');
 
   // Title
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(0, 0, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text('ARIYA THANGAM FANCY DRESS FOR RENT', 14, 16);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(203, 213, 225); // slate-300
+  doc.setTextColor(0, 0, 0); // slate-300
   doc.text('Cloakroom Costume Rental & Counter System', 14, 23);
   doc.text('Official Rental Invoice / Handover Ticket', 14, 29);
 
   // Invoice Number & Booking Number
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(250, 204, 21); // yellow accent for Booking #
+  doc.setTextColor(0, 0, 0); // yellow accent for Booking #
   doc.text(`BOOKING #: ${rental.bookingNumber || 'BK-1001'}`, 196, 16, { align: 'right' });
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(203, 213, 225);
+  doc.setTextColor(0, 0, 0);
   doc.text(`Ticket ID: #${rental.id.slice(-6).toUpperCase()}`, 196, 22, { align: 'right' });
   doc.text(`Date: ${rental.dateGiven}`, 196, 27, { align: 'right' });
   doc.text(`Status: ${statusLabel}`, 196, 32, { align: 'right' });
 
   // --- Customer & Rental Info Box ---
-  doc.setFillColor(248, 250, 252); // slate-50
-  doc.setDrawColor(226, 232, 240); // slate-200
-  doc.roundedRect(14, 43, 182, 38, 2, 2, 'FD');
+  doc.setFillColor(255, 255, 255); // slate-50
+  doc.setDrawColor(0, 0, 0); // slate-200
+  doc.roundedRect(14, 43, 182, 38, 2, 2, 'S');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
-  doc.setTextColor(30, 41, 59); // slate-800
+  doc.setTextColor(0, 0, 0); // slate-800
   doc.text('CUSTOMER DETAILS', 20, 50);
   doc.text('RENTAL PERIOD & TERMS', 110, 50);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(71, 85, 105); // slate-600
+  doc.setTextColor(0, 0, 0); // slate-600
 
   // Left col: Customer Information (including Address)
   doc.text(`Name: ${rental.customerName}`, 20, 57);
@@ -120,15 +120,16 @@ export function generateRentalInvoicePDF(rental: Rental) {
     startY: 86,
     head: [['#', 'Item / Outfit Name', 'Category', 'Size', 'Qty', 'Unit Rate', 'Total']],
     body: tableData,
-    theme: 'striped',
+    theme: 'grid',
+    styles: { lineColor: [0, 0, 0], lineWidth: 0.1 },
     headStyles: {
-      fillColor: [30, 58, 138], // Dark Blue / Navy (#1e3a8a)
-      textColor: 255,
+      fillColor: [255, 255, 255], // Dark Blue / Navy (#1e3a8a)
+      textColor: [0, 0, 0],
       fontStyle: 'bold',
       fontSize: 9,
     },
     bodyStyles: {
-      textColor: 51,
+      textColor: [0, 0, 0],
       fontSize: 8.5,
     },
     columnStyles: {
@@ -146,12 +147,13 @@ export function generateRentalInvoicePDF(rental: Rental) {
   // --- Summary Box ---
   const finalY = (doc as any).lastAutoTable.finalY + 6;
 
-  doc.setFillColor(241, 245, 249); // slate-100
-  doc.roundedRect(106, finalY, 90, 42, 2, 2, 'F');
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(0, 0, 0); // slate-100
+  doc.roundedRect(106, finalY, 90, 42, 2, 2, 'S');
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(71, 85, 105);
+  doc.setTextColor(0, 0, 0);
 
   doc.text('Net Rental Charge (Revenue):', 112, finalY + 8);
   doc.text('Refundable Security Deposit:', 112, finalY + 16);
@@ -159,7 +161,7 @@ export function generateRentalInvoicePDF(rental: Rental) {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
-  doc.setTextColor(15, 23, 42);
+  doc.setTextColor(0, 0, 0);
 
   doc.text(formatCurrency(rental.rentalCharge), 190, finalY + 8, { align: 'right' });
   doc.text(formatCurrency(rental.advanceAmount), 190, finalY + 16, { align: 'right' });
@@ -168,17 +170,17 @@ export function generateRentalInvoicePDF(rental: Rental) {
   doc.text(depositText, 190, finalY + 24, { align: 'right' });
 
   // Divider
-  doc.setDrawColor(203, 213, 225);
+  doc.setDrawColor(0, 0, 0);
   doc.line(112, finalY + 27, 190, finalY + 27);
 
   doc.setFontSize(10);
-  doc.setTextColor(30, 58, 138); // Navy Blue
+  doc.setTextColor(0, 0, 0); // Navy Blue
   doc.text('Net Rental Fee Paid:', 112, finalY + 33);
   doc.text(formatCurrency(rental.rentalCharge), 190, finalY + 33, { align: 'right' });
 
   doc.setFontSize(7);
   doc.setFont('helvetica', 'italic');
-  doc.setTextColor(100, 116, 139);
+  doc.setTextColor(0, 0, 0);
   doc.text('* Advance deposit is fully refunded on return & excluded from revenue', 112, finalY + 38);
 
   // --- Terms & Signatures ---
@@ -186,7 +188,7 @@ export function generateRentalInvoicePDF(rental: Rental) {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
-  doc.setTextColor(100, 116, 139);
+  doc.setTextColor(0, 0, 0);
   doc.text('TERMS & CONDITIONS:', 14, termsY);
 
   doc.setFont('helvetica', 'normal');
@@ -196,19 +198,19 @@ export function generateRentalInvoicePDF(rental: Rental) {
   doc.text('3. Security advance deposit is treated purely as a refundable security hold and not shop revenue.', 14, termsY + 13);
 
   // Signature Lines
-  doc.setDrawColor(203, 213, 225);
+  doc.setDrawColor(0, 0, 0);
   doc.line(14, termsY + 32, 70, termsY + 32);
   doc.line(130, termsY + 32, 186, termsY + 32);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.setTextColor(100, 116, 139);
+  doc.setTextColor(0, 0, 0);
   doc.text('Customer Signature', 14, termsY + 37);
   doc.text('Shop Counter Staff', 130, termsY + 37);
 
   // Footer
   doc.setFontSize(7.5);
-  doc.setTextColor(148, 163, 184);
+  doc.setTextColor(0, 0, 0);
   doc.text('Thank you for choosing Ariya Thangam Fancy Dress For Rent! Safe & Stylish.', 105, 285, { align: 'center' });
 
   // Save/Download PDF
@@ -231,28 +233,28 @@ export function generateFinancialReportPDF(
   });
 
   // --- Dark Blue Header ---
-  doc.setFillColor(15, 23, 42); // slate-900 / dark navy
-  doc.rect(0, 0, 210, 40, 'F');
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(0, 0, 0);
+  doc.rect(0, 0, 210, 40, 'S');
 
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(0, 0, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text('ARIYA THANGAM FANCY DRESS FOR RENT', 14, 16);
 
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(203, 213, 225);
+  doc.setTextColor(0, 0, 0);
   doc.text('Cloakroom — Financial Statement & Revenue Summary', 14, 23);
   doc.text(`Period Covered: ${startDateLabel} to ${endDateLabel}`, 14, 29);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(147, 197, 253); // sky-300
+  doc.setTextColor(0, 0, 0);
   doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 196, 18, { align: 'right' });
   doc.text(`Total Bookings: ${filteredRentals.length}`, 196, 26, { align: 'right' });
 
   // --- Financial Summary Cards inside PDF ---
-  // Revenue is strictly rental charges, EXCLUDING advance deposits (which are refunded)
   const totalRevenue = filteredRentals.reduce((sum, r) => sum + r.rentalCharge, 0);
   const realizedRev = filteredRentals
     .filter(r => getRentalComputedStatus(r) === 'returned')
@@ -260,13 +262,13 @@ export function generateFinancialReportPDF(
   const totalDeposits = filteredRentals.reduce((sum, r) => sum + r.advanceAmount, 0);
   const avgOrderVal = filteredRentals.length > 0 ? Math.round(totalRevenue / filteredRentals.length) : 0;
 
-  doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(14, 46, 182, 28, 2, 2, 'FD');
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(0, 0, 0);
+  doc.roundedRect(14, 46, 182, 28, 2, 2, 'S');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.setTextColor(100, 116, 139);
+  doc.setTextColor(0, 0, 0);
 
   doc.text('NET REVENUE BOOKED', 20, 53);
   doc.text('REALIZED (RETURNED)', 65, 53);
@@ -275,7 +277,7 @@ export function generateFinancialReportPDF(
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(30, 58, 138); // Dark Navy
+  doc.setTextColor(0, 0, 0);
 
   doc.text(formatCurrency(totalRevenue), 20, 62);
   doc.text(formatCurrency(realizedRev), 65, 62);
@@ -305,15 +307,16 @@ export function generateFinancialReportPDF(
     startY: 80,
     head: [['#', 'Booking #', 'Date', 'Customer', 'Phone', 'Items', 'Rental Fee', 'Deposit', 'Status']],
     body: tableRows,
-    theme: 'striped',
+    theme: 'grid',
+    styles: { lineColor: [0, 0, 0], lineWidth: 0.1 },
     headStyles: {
-      fillColor: [15, 23, 42],
-      textColor: 255,
+      fillColor: [255, 255, 255],
+      textColor: [0, 0, 0],
       fontStyle: 'bold',
       fontSize: 8,
     },
     bodyStyles: {
-      textColor: 51,
+      textColor: [0, 0, 0],
       fontSize: 7.5,
     },
     columnStyles: {
@@ -335,7 +338,7 @@ export function generateFinancialReportPDF(
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
-    doc.setTextColor(148, 163, 184);
+    doc.setTextColor(0, 0, 0);
     doc.text(`Ariya Thangam Fancy Dress For Rent — Financial Report — Page ${i} of ${pageCount}`, 105, 287, { align: 'center' });
   }
 

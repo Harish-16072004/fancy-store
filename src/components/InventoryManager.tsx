@@ -3,7 +3,9 @@ import { Plus, Edit2, Trash2, Search, Filter, Tag, Hash, FileImage, Sparkles, Ch
 import { Category, InventoryItem, Rental } from '../types';
 import { getItemBookedRentals } from '../utils/availability';
 import CostumeScheduleModal from './CostumeScheduleModal';
+import InventoryItemForm from './inventory/InventoryItemForm';
 import * as XLSX from 'xlsx';
+import { toPaise, toRupees, formatINR } from '../utils/money';
 
 interface InventoryManagerProps {
   categories: Category[];
@@ -53,14 +55,14 @@ export default function InventoryManager({
         'Category': category ? category.name : 'Unknown',
         'Size': item.size,
         'Stock Quantity': item.quantity,
-        'Rental Price (₹)': item.rentalPrice,
+        'Rental Price (₹)': toRupees(item.rentalPrice),
       };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(dataRows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory Stock');
-    
+
     worksheet['!cols'] = [{ wch: 25 }, { wch: 18 }, { wch: 10 }, { wch: 15 }, { wch: 18 }];
 
     XLSX.writeFile(workbook, `costume_inventory_report_${new Date().toISOString().split('T')[0]}.xlsx`);
@@ -141,7 +143,7 @@ export default function InventoryManager({
     setItemCatId(item.categoryId);
     setItemSize(item.size);
     setItemQty(item.quantity);
-    setItemPrice(item.rentalPrice);
+    setItemPrice(toRupees(item.rentalPrice));
     setItemPhoto(item.photo || '');
     setIsItemFormOpen(true);
   };
@@ -156,7 +158,7 @@ export default function InventoryManager({
       categoryId: itemCatId,
       size: itemSize,
       quantity: itemQty,
-      rentalPrice: itemPrice,
+      rentalPrice: toPaise(itemPrice),
       photo: itemPhoto || undefined,
     };
 
@@ -220,22 +222,20 @@ export default function InventoryManager({
         <button
           type="button"
           onClick={() => setActiveTab('items')}
-          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
-            activeTab === 'items'
+          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${activeTab === 'items'
               ? 'neo-pressed text-[var(--color-navy)]'
               : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
-          }`}
+            }`}
         >
           Outfits / Costumes ({inventory.length})
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('categories')}
-          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
-            activeTab === 'categories'
+          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${activeTab === 'categories'
               ? 'neo-pressed text-[var(--color-navy)]'
               : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
-          }`}
+            }`}
         >
           Categories ({categories.length})
         </button>
@@ -298,144 +298,26 @@ export default function InventoryManager({
           </div>
 
           {/* Costume Form (Inline Modal Style) */}
-          {isItemFormOpen && (
-            <div className="p-8 neo-flat space-y-6 animate-fadeIn relative">
-              <h3 className="text-2xl font-black text-[var(--color-navy)] border-b border-[rgba(0,0,0,0.05)] pb-4">
-                {editingItemId ? 'Edit Costume Outfit' : 'Add New Costume Outfit'}
-              </h3>
-
-              <form onSubmit={handleSaveItem} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Costume Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g., Tiger Costume Deluxe"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Category *</label>
-                      <select
-                        required
-                        value={itemCatId}
-                        onChange={(e) => setItemCatId(e.target.value)}
-                        className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
-                      >
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Size *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g., S, M, L, XL"
-                        value={itemSize}
-                        onChange={(e) => setItemSize(e.target.value)}
-                        className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Quantity *</label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={itemQty}
-                        onChange={(e) => setItemQty(parseInt(e.target.value) || 0)}
-                        className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Rent (₹) *</label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={itemPrice}
-                        onChange={(e) => setItemPrice(parseInt(e.target.value) || 0)}
-                        className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-[var(--color-sky)]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6 flex flex-col justify-between">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Photo</label>
-                    <div className="flex items-center gap-6">
-                      {itemPhoto ? (
-                        <div className="relative w-32 h-32 neo-pressed overflow-hidden shrink-0">
-                          <img referrerPolicy="no-referrer" src={itemPhoto} alt="Preview" className="w-full h-full object-cover mix-blend-multiply rounded-lg" />
-                          <button
-                            type="button"
-                            onClick={() => setItemPhoto('')}
-                            className="absolute top-2 right-2 p-1.5 neo-btn text-red-500"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="w-32 h-32 neo-pressed flex flex-col items-center justify-center text-slate-400 shrink-0">
-                          <FileImage className="w-8 h-8 mb-2" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">No Photo</span>
-                        </div>
-                      )}
-
-                      <div className="flex-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoUpload}
-                          className="hidden"
-                          id="file-item-photo"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => document.getElementById('file-item-photo')?.click()}
-                          className="px-6 py-3 neo-btn font-bold text-xs uppercase tracking-widest cursor-pointer w-full"
-                        >
-                          Select Image
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 justify-end pt-6">
-                    <button
-                      type="button"
-                      onClick={() => setIsItemFormOpen(false)}
-                      className="px-6 py-3 neo-btn text-slate-500 font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-3 neo-btn-primary font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Check className="w-5 h-5" />
-                      Save Costume
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          )}
+          <InventoryItemForm
+            isItemFormOpen={isItemFormOpen}
+            editingItemId={editingItemId}
+            itemName={itemName}
+            setItemName={setItemName}
+            itemCatId={itemCatId}
+            setItemCatId={setItemCatId}
+            itemSize={itemSize}
+            setItemSize={setItemSize}
+            itemQty={itemQty}
+            setItemQty={setItemQty}
+            itemPrice={itemPrice}
+            setItemPrice={setItemPrice}
+            itemPhoto={itemPhoto}
+            setItemPhoto={setItemPhoto}
+            categories={categories}
+            handleSaveItem={handleSaveItem}
+            handlePhotoUpload={handlePhotoUpload}
+            setIsItemFormOpen={setIsItemFormOpen}
+          />
 
           {/* Costumes Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -456,7 +338,7 @@ export default function InventoryManager({
                       <img
                         src={item.photo}
                         alt={item.name}
-                        className="w-full h-full object-cover mix-blend-multiply rounded-lg transition-transform group-hover:scale-105"
+                        className="w-full h-full object-contain mix-blend-multiply rounded-lg transition-transform group-hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
@@ -474,7 +356,7 @@ export default function InventoryManager({
                     </div>
 
                     <div className="absolute bottom-3 right-3 bg-[var(--color-sky)] text-white font-mono font-black text-xs px-3 py-1 shadow-md rounded-lg">
-                      ₹{item.rentalPrice}/day
+                      {formatINR(item.rentalPrice)}/day
                     </div>
                   </div>
 

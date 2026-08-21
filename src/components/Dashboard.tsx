@@ -14,6 +14,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Rental } from '../types';
+import { formatINR, toRupees } from '../utils/money';
 import { getRentalComputedStatus } from '../utils/storage';
 
 interface DashboardProps {
@@ -141,7 +142,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Active Deposits</p>
               <h3 className="text-5xl font-black text-emerald-500 mt-4 font-mono flex items-center">
                 <IndianRupee className="w-8 h-8 -mr-1 shrink-0 text-emerald-400" />
-                {totalPendingAdvance}
+                {toRupees(totalPendingAdvance).toLocaleString('en-IN')}
               </h3>
             </div>
             <div className="p-4 neo-pressed text-emerald-500">
@@ -151,7 +152,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
           <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center text-slate-600">
             <span className="text-xs font-bold text-emerald-500">Held in Safe</span>
             <span className="text-[10px] neo-pressed text-emerald-600 px-3 py-1.5 font-bold uppercase tracking-widest">
-              Total: ₹{totalActiveDeposits}
+              Total: {formatINR(totalActiveDeposits)}
             </span>
           </div>
         </div>

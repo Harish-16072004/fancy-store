@@ -215,7 +215,10 @@ function mapDbRentalToRental(dbRental: any): Rental {
   };
 }
 
-export async function fetchRentals(): Promise<{ data: Rental[] | null; error: any }> {
+export async function fetchRentals(page: number = 1, pageSize: number = 50): Promise<{ data: Rental[] | null; error: any }> {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   const { data, error } = await supabase
     .from('rentals')
     .select(`
@@ -224,7 +227,8 @@ export async function fetchRentals(): Promise<{ data: Rental[] | null; error: an
       additional_items(*),
       rental_photos(*)
     `)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (error) return { data: null, error };
   return { data: (data || []).map(mapDbRentalToRental), error: null };
@@ -249,64 +253,49 @@ export async function fetchRentalById(id: string): Promise<{ data: Rental | null
 export async function createRentalDb(
   rentalData: Omit<Rental, 'id' | 'createdAt'>
 ): Promise<{ data: Rental | null; error: any }> {
-  // 1. Insert the rental record
-  const { data: rental, error: rentalError } = await supabase
-    .from('rentals')
-    .insert({
-      booking_number: rentalData.bookingNumber,
-      customer_name: rentalData.customerName,
-      customer_phone: rentalData.customerPhone,
-      customer_address: rentalData.customerAddress || null,
-      date_given: rentalData.dateGiven,
-      expected_return_date: rentalData.expectedReturnDate,
-      actual_return_date: rentalData.actualReturnDate || null,
-      status: rentalData.status,
-      is_pre_booking: rentalData.isPreBooking || false,
-      pre_booking_paid: rentalData.preBookingPaid || 0,
-      rental_charge: rentalData.rentalCharge,
-      advance_amount: rentalData.advanceAmount,
-      advance_returned: rentalData.advanceReturned,
-      notes: rentalData.notes || null,
-    })
-    .select()
-    .single();
-
-  if (rentalError || !rental) return { data: null, error: rentalError };
-
-  // 2. Insert rental line items
-  if (rentalData.items && rentalData.items.length > 0) {
-    const itemRows = rentalData.items.map(item => ({
-      rental_id: rental.id,
+  // 1. Prepare payload for the RPC
+  const payload = {
+    booking_number: rentalData.bookingNumber,
+    customer_name: rentalData.customerName,
+    customer_phone: rentalData.customerPhone,
+    customer_address: rentalData.customerAddress || null,
+    date_given: rentalData.dateGiven,
+    expected_return_date: rentalData.expectedReturnDate,
+    actual_return_date: rentalData.actualReturnDate || null,
+    status: rentalData.status,
+    is_pre_booking: rentalData.isPreBooking || false,
+    pre_booking_paid: rentalData.preBookingPaid || 0,
+    rental_charge: rentalData.rentalCharge,
+    advance_amount: rentalData.advanceAmount,
+    advance_returned: rentalData.advanceReturned || false,
+    notes: rentalData.notes || null,
+    items: rentalData.items ? rentalData.items.map(item => ({
       item_id: item.itemId || null,
       name: item.name,
       category_name: item.categoryName,
       size: item.size,
       quantity: item.quantity,
       rental_price: item.rentalPrice,
-    }));
-    const { error: itemsErr } = await supabase.from('rental_items').insert(itemRows);
-    if (itemsErr) console.error('Error inserting rental items:', itemsErr);
-  }
-
-  // 3. Insert additional accessories
-  if (rentalData.additionalItems && rentalData.additionalItems.length > 0) {
-    const addRows = rentalData.additionalItems.map(ai => ({
-      rental_id: rental.id,
+    })) : [],
+    additional_items: rentalData.additionalItems ? rentalData.additionalItems.map(ai => ({
       name: ai.name,
       quantity: ai.quantity,
-    }));
-    const { error: addErr } = await supabase.from('additional_items').insert(addRows);
-    if (addErr) console.error('Error inserting additional items:', addErr);
-  }
+    })) : [],
+  };
+
+  // 2. Execute the atomic transaction via RPC
+  const { data: rentalId, error: rpcError } = await supabase.rpc('process_rental_checkout', { payload });
+
+  if (rpcError || !rentalId) return { data: null, error: rpcError };
 
   // 4. Upload handover photos to storage & insert photo records
   if (rentalData.handoverPhotos && rentalData.handoverPhotos.length > 0) {
     for (const photo of rentalData.handoverPhotos) {
       if (photo.startsWith('data:')) {
-        const path = await uploadPhoto(photo, `rentals/${rental.id}/handover`);
+        const path = await uploadPhoto(photo, `rentals/${rentalId}/handover`);
         if (path) {
           await supabase.from('rental_photos').insert({
-            rental_id: rental.id,
+            rental_id: rentalId,
             photo_path: path,
             photo_type: 'handover',
           });
@@ -316,7 +305,7 @@ export async function createRentalDb(
   }
 
   // 5. Return the complete rental with all nested data
-  return fetchRentalById(rental.id);
+  return fetchRentalById(rentalId);
 }
 
 export async function updateRentalDb(

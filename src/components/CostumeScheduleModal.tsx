@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Calendar, Clock, User, Phone, CheckCircle2, AlertTriangle, Sparkles, Hash, ArrowRight } from 'lucide-react';
 import { InventoryItem, Rental } from '../types';
+import { formatINR } from '../utils/money';
 import { getItemBookedRentals, checkDateRangeOverlap } from '../utils/availability';
 
 interface CostumeScheduleModalProps {
@@ -44,7 +45,7 @@ export default function CostumeScheduleModal({
             <div className="flex items-center gap-3 text-xs text-slate-300 mt-1 font-mono">
               <span>Size: <strong className="text-white">{item.size}</strong></span>
               <span>•</span>
-              <span>Rate: <strong className="text-emerald-400">₹{item.rentalPrice}/day</strong></span>
+              <span>Rate: <strong className="text-emerald-400">{formatINR(item.rentalPrice)}/day</strong></span>
             </div>
           </div>
 
@@ -163,7 +164,7 @@ export default function CostumeScheduleModal({
                           <Phone className="w-3 h-3 text-slate-400" /> {rental.customerPhone || 'No phone recorded'}
                         </span>
                         <span>
-                          {rental.isPreBooking ? `Token Paid: ₹${rental.preBookingPaid || 0}` : 'Active In-Field'}
+                          {rental.isPreBooking ? `Token Paid: ${formatINR(rental.preBookingPaid || 0)}` : 'Active In-Field'}
                         </span>
                       </div>
                     </div>

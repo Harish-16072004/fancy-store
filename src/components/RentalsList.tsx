@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, Calendar, User, Phone, MapPin, CheckCircle2, AlertCircle, Trash2, Edit2, FileDown, Eye, Camera, Check, ToggleLeft, ToggleRight, X, Sparkles, Receipt, HelpCircle, ArrowRight, Printer, Download } from 'lucide-react';
 import { Rental, Category, InventoryItem } from '../types';
+import { toPaise, toRupees, formatINR } from '../utils/money';
 import { getRentalComputedStatus } from '../utils/storage';
 import { generateRentalInvoicePDF } from '../utils/pdfGenerator';
 import CameraCapture from './CameraCapture';
@@ -91,7 +92,7 @@ export default function RentalsList({
     const dataRows = listToExport.map((r) => {
       const computed = getRentalComputedStatus(r);
       const outfitSummary = r.items
-        .map((item) => `${item.name} [Size: ${item.size}, Qty: ${item.quantity}, Price: ₹${item.rentalPrice}]`)
+        .map((item) => `${item.name} [Size: ${item.size}, Qty: ${item.quantity}, Price: ${formatINR(item.rentalPrice)}]`)
         .join('; ');
       
       const accessorySummary = r.additionalItems
@@ -109,10 +110,10 @@ export default function RentalsList({
         'Expected Return Date': r.expectedReturnDate,
         'Actual Return Date': r.actualReturnDate || 'Not Returned',
         'Status': computed.toUpperCase(),
-        'Rental Charge (₹)': r.rentalCharge,
-        'Security Deposit (₹)': r.advanceAmount,
-        'Pre-Booking Paid Today (₹)': r.preBookingPaid || 0,
-        'Remaining Balance Due (₹)': (r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0),
+        'Rental Charge (₹)': toRupees(r.rentalCharge),
+        'Security Deposit (₹)': toRupees(r.advanceAmount),
+        'Pre-Booking Paid Today (₹)': toRupees(r.preBookingPaid || 0),
+        'Remaining Balance Due (₹)': toRupees((r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0)),
         'Advance Deposit Returned': r.advanceReturned ? 'YES (Refunded)' : 'NO (Held)',
         'Handover Notes': r.notes || '',
       };
@@ -140,13 +141,13 @@ export default function RentalsList({
         status: 'active',
         dateGiven: new Date().toISOString().split('T')[0], // Set actual handover date to today
       });
-      alert(`Dress handed over for Booking #${rental.bookingNumber}! Collected remaining balance of ₹${remainingBalance}. Order is now ACTIVE.`, 'success');
+      alert(`Dress handed over for Booking #${rental.bookingNumber}! Collected remaining balance of ${formatINR(remainingBalance)}. Order is now ACTIVE.`, 'success');
     };
 
     if (onShowConfirm) {
       onShowConfirm(
         `Complete Handover for Booking #${rental.bookingNumber}`,
-        `Customer: ${rental.customerName} (${rental.customerPhone})\n\n• Total Order Cost (Rent + Deposit): ₹${totalOrderCost}\n• Pre-Booking Token Paid: ₹${rental.preBookingPaid || 0}\n• REMAINING BALANCE TO COLLECT TODAY: ₹${remainingBalance}\n\nConfirm collecting ₹${remainingBalance} and completing costume handover?`,
+        `Customer: ${rental.customerName} (${rental.customerPhone})\n\n• Total Order Cost (Rent + Deposit): ${formatINR(totalOrderCost)}\n• Pre-Booking Token Paid: ${formatINR(rental.preBookingPaid || 0)}\n• REMAINING BALANCE TO COLLECT TODAY: ${formatINR(remainingBalance)}\n\nConfirm collecting ${formatINR(remainingBalance)} and completing costume handover?`,
         executeHandover
       );
     } else {
@@ -462,7 +463,7 @@ export default function RentalsList({
                 type="number"
                 required
                 min="0"
-                value={editCharge}
+                value={editCharge ? toRupees(editCharge) : ""}
                 onChange={(e) => setEditCharge(parseInt(e.target.value) || 0)}
                 className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-[var(--color-sky)]"
               />
@@ -496,7 +497,7 @@ export default function RentalsList({
                 type="number"
                 required
                 min="0"
-                value={editAdvance}
+                value={editAdvance ? toRupees(editAdvance) : ""}
                 onChange={(e) => setEditAdvance(parseInt(e.target.value) || 0)}
                 className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-emerald-500"
               />
@@ -507,7 +508,7 @@ export default function RentalsList({
               <input
                 type="number"
                 min="0"
-                value={editPreBookingPaid}
+                value={editPreBookingPaid ? toRupees(editPreBookingPaid) : ""}
                 onChange={(e) => setEditPreBookingPaid(parseInt(e.target.value) || 0)}
                 className="w-full px-4 py-3 neo-pressed ring-1 ring-amber-400 text-sm font-bold font-mono text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
@@ -657,14 +658,14 @@ export default function RentalsList({
                   <div className="space-y-1">
                     <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">Rent</span>
                     <span className="font-black text-[var(--color-sky)] font-mono">
-                      ₹{rental.rentalCharge}
+                      {formatINR(rental.rentalCharge)}
                     </span>
                   </div>
 
                   <div className="space-y-1">
                     <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">Deposit</span>
                     <span className={`font-black font-mono ${rental.advanceReturned ? 'text-slate-400 line-through' : 'text-emerald-500'}`}>
-                      ₹{rental.advanceAmount}
+                      {formatINR(rental.advanceAmount)}
                     </span>
                   </div>
 
@@ -673,11 +674,11 @@ export default function RentalsList({
                     <div className="col-span-2 pt-4 border-t border-[rgba(0,0,0,0.05)] mt-2 space-y-2">
                       <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-amber-500">
                         <span>Paid Token:</span>
-                        <span className="font-mono text-emerald-500">₹{prePaid}</span>
+                        <span className="font-mono text-emerald-500">{formatINR(prePaid)}</span>
                       </div>
                       <div className="flex justify-between text-sm font-black text-[var(--color-navy)] border-t border-[rgba(0,0,0,0.05)] pt-2">
                         <span className="uppercase tracking-widest text-[10px]">Due at Handover:</span>
-                        <span className="font-mono text-amber-500 text-lg leading-none">₹{remainingBalance}</span>
+                        <span className="font-mono text-amber-500 text-lg leading-none">{formatINR(remainingBalance)}</span>
                       </div>
                     </div>
                   )}
@@ -863,7 +864,7 @@ export default function RentalsList({
                           <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{item.categoryName} • Size {item.size}</p>
                         </div>
                         <div className="text-right font-mono text-xs font-bold text-[var(--color-sky)]">
-                          {item.quantity} × ₹{item.rentalPrice} = ₹{item.quantity * item.rentalPrice}
+                          {item.quantity} × {formatINR(item.rentalPrice)} = {formatINR(item.quantity * item.rentalPrice)}
                         </div>
                       </div>
                     ))}
@@ -910,28 +911,28 @@ export default function RentalsList({
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between text-slate-600 font-bold">
                       <span>Rent (Revenue)</span>
-                      <span className="font-mono text-[var(--color-navy)]">₹{r.rentalCharge}</span>
+                      <span className="font-mono text-[var(--color-navy)]">{formatINR(r.rentalCharge)}</span>
                     </div>
                     <div className="flex justify-between text-slate-600 font-bold">
                       <span>Security Deposit</span>
-                      <span className="font-mono">₹{r.advanceAmount}</span>
+                      <span className="font-mono">{formatINR(r.advanceAmount)}</span>
                     </div>
 
                     {r.isPreBooking || r.preBookingPaid ? (
                       <>
                         <div className="flex justify-between text-amber-600 font-bold neo-flat p-3 mt-4">
                           <span>Token Paid</span>
-                          <span className="font-mono">₹{r.preBookingPaid || 0}</span>
+                          <span className="font-mono">{formatINR(r.preBookingPaid || 0)}</span>
                         </div>
                         <div className="pt-4 flex justify-between font-black text-[var(--color-navy)] text-lg">
                           <span>Balance Due</span>
-                          <span className="font-mono text-[var(--color-sky)]">₹{(r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0)}</span>
+                          <span className="font-mono text-[var(--color-sky)]">{formatINR((r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0))}</span>
                         </div>
                       </>
                     ) : (
                       <div className="border-t border-[rgba(0,0,0,0.05)] pt-4 flex justify-between font-black text-[var(--color-navy)] text-lg">
                         <span>Total Paid</span>
-                        <span className="font-mono text-[var(--color-sky)]">₹{r.rentalCharge + r.advanceAmount}</span>
+                        <span className="font-mono text-[var(--color-sky)]">{formatINR(r.rentalCharge + r.advanceAmount)}</span>
                       </div>
                     )}
 

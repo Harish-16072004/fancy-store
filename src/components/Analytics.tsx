@@ -26,7 +26,8 @@ import {
   Percent, 
   IndianRupee 
 } from 'lucide-react';
-import { Rental, InventoryItem } from '../types';
+import { InventoryItem, Rental } from '../types';
+import { formatINR } from '../utils/money';
 import { getRentalComputedStatus } from '../utils/storage';
 import { generateFinancialReportPDF } from '../utils/pdfGenerator';
 
@@ -225,7 +226,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
           </div>
           <div>
             <h4 className="text-3xl font-black text-[var(--color-navy)] font-mono">
-              ₹{totalBookedRevenue}
+              {formatINR(totalBookedRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
               Net fees ({rentals.length} bookings)
@@ -243,7 +244,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
           </div>
           <div>
             <h4 className="text-3xl font-black text-emerald-500 font-mono">
-              ₹{realizedRevenue}
+              {formatINR(realizedRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
               Settled & Returned
@@ -261,7 +262,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
           </div>
           <div>
             <h4 className="text-3xl font-black text-blue-500 font-mono">
-              ₹{activeRevenue}
+              {formatINR(activeRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
               In-field items
@@ -279,7 +280,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
           </div>
           <div>
             <h4 className="text-3xl font-black text-[var(--color-navy)] font-mono">
-              ₹{avgTicketSize}
+              {formatINR(avgTicketSize)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
               Spend / Booking
@@ -306,7 +307,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
             </p>
             <p className="text-xs font-bold text-emerald-500 mt-2 flex items-center gap-1 uppercase tracking-widest">
               <ArrowUpRight className="w-4 h-4" />
-              ₹{peakMonth.revenue} ({peakMonth.count} orders)
+              {formatINR(peakMonth.revenue)} ({peakMonth.count} orders)
             </p>
           </div>
           <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
@@ -327,7 +328,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
               {topRepeatedOutfits[0]?.name || 'N/A'}
             </p>
             <p className="text-[10px] font-bold text-[var(--color-sky)] mt-2 font-mono uppercase tracking-widest">
-              {topRepeatedOutfits[0]?.count || 0} times • ₹{topRepeatedOutfits[0]?.totalRevenue || 0}
+              {topRepeatedOutfits[0]?.count || 0} times • {formatINR(topRepeatedOutfits[0]?.totalRevenue || 0)}
             </p>
           </div>
           <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
@@ -390,7 +391,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                   <YAxis tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
-                    formatter={(value: any) => [`₹${value}`, 'Revenue']}
+                    formatter={(value: any) => [`${formatINR(value)}`, 'Revenue']}
                   />
                   <Area type="monotone" dataKey="revenue" stroke="#0ea5e9" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>
@@ -426,7 +427,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                   <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#102A43', fontWeight: 800 }} width={100} axisLine={false} tickLine={false} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
-                    formatter={(val: any, name: any, item: any) => [`${val} times (₹${item.payload.revenue})`, 'Usage']}
+                    formatter={(val: any, name: any, item: any) => [`${val} times (${formatINR(item.payload.revenue)})`, 'Usage']}
                   />
                   <Bar dataKey="rentals" radius={[4, 4, 4, 4]} barSize={16}>
                     {outfitChartData.map((_, index) => (
@@ -514,15 +515,15 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 neo-pressed p-6">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Period Revenue</p>
-            <p className="text-2xl font-black text-[var(--color-navy)] font-mono mt-2">₹{periodTotalRevenue}</p>
+            <p className="text-2xl font-black text-[var(--color-navy)] font-mono mt-2">{formatINR(periodTotalRevenue)}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Realized Cash</p>
-            <p className="text-2xl font-black text-emerald-500 font-mono mt-2">₹{periodRealizedRevenue}</p>
+            <p className="text-2xl font-black text-emerald-500 font-mono mt-2">{formatINR(periodRealizedRevenue)}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Deposits Handled</p>
-            <p className="text-2xl font-black text-[var(--color-sky)] font-mono mt-2">₹{periodDepositsHandled}</p>
+            <p className="text-2xl font-black text-[var(--color-sky)] font-mono mt-2">{formatINR(periodDepositsHandled)}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Bookings</p>
