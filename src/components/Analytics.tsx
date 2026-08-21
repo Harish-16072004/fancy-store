@@ -192,13 +192,13 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 neo-pressed text-[var(--color-navy)] px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider">
               <BarChart3 className="w-4 h-4 text-[var(--color-sky)]" />
-              Unified Financials
+              Store Reports
             </div>
             <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[var(--color-navy)]">
-              Revenue & Insights
+              Income & Trends
             </h2>
             <p className="text-slate-500 text-sm max-w-2xl font-medium">
-              Track peak sales months, analyze top-performing costumes, examine revenue metrics, and export precise period statements.
+              See your best-selling costumes, track your monthly income, and download custom date statements.
             </p>
           </div>
 
@@ -219,7 +219,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         {/* Total Booked Revenue */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Total Booked</p>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Total Sales</p>
             <span className="text-[var(--color-navy)] neo-pressed p-2">
               <TrendingUp className="w-5 h-5 text-[var(--color-sky)]" />
             </span>
@@ -229,7 +229,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
               {formatINR(totalBookedRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
-              Net fees ({rentals.length} bookings)
+              Total Rent Amount
             </p>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         {/* Realized Revenue */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Realized Cash</p>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Completed Sales</p>
             <span className="text-emerald-500 neo-pressed p-2">
               <CheckCircle className="w-5 h-5" />
             </span>
@@ -247,7 +247,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
               {formatINR(realizedRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
-              Settled & Returned
+              From Returned Items
             </p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         {/* Ongoing Revenue */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Active Rent</p>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Pending Income</p>
             <span className="text-blue-500 neo-pressed p-2">
               <Activity className="w-5 h-5" />
             </span>
@@ -265,7 +265,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
               {formatINR(activeRevenue)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
-              In-field items
+              From Currently Rented Items
             </p>
           </div>
         </div>
@@ -273,7 +273,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         {/* Average Order Value */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Avg Ticket (AOV)</p>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Average Bill</p>
             <span className="text-[var(--color-navy)] neo-pressed p-2">
               <Percent className="w-5 h-5 text-amber-500" />
             </span>
@@ -283,7 +283,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
               {formatINR(avgTicketSize)}
             </h4>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
-              Spend / Booking
+              Per Order
             </p>
           </div>
         </div>
@@ -339,21 +339,21 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         {/* Total Lifetime Bookings */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Handovers</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Orders</span>
             <div className="neo-pressed p-2 text-[var(--color-navy)]">
               <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
           <div>
             <p className="text-3xl font-black text-[var(--color-navy)] font-mono">
-              {rentals.length} Tickets
+              {rentals.length} Orders
             </p>
             <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">
               Across {inventory.length} styles
             </p>
           </div>
           <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            All-time database logs.
+            All-time rental records.
           </div>
         </div>
 

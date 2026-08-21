@@ -55,10 +55,10 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
               Live Monitor
             </div>
             <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[var(--color-navy)]">
-              Operations Center
+              Store Dashboard
             </h2>
             <p className="text-slate-500 font-medium text-sm max-w-2xl leading-relaxed">
-              Real-time monitoring of rentals, returns, and security deposits.
+              Real-time monitoring of active rentals, overdue items, and advance deposits.
             </p>
           </div>
 
@@ -69,7 +69,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
               className="self-start md:self-auto flex items-center gap-2 neo-btn-primary px-6 py-4"
             >
               <BarChart3 className="w-5 h-5 text-white" />
-              Financials & Reports →
+              Income & Reports →
             </button>
           )}
         </div>
@@ -96,7 +96,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
           </div>
           <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center">
             <span className="text-xs font-bold text-[var(--color-navy)] group-hover:text-[var(--color-sky)] transition-colors">View Active</span>
-            <span className="text-[10px] text-[var(--color-sky)] neo-pressed px-3 py-1.5 font-bold uppercase tracking-widest">On Rent</span>
+            <span className="text-[10px] text-[var(--color-sky)] neo-pressed px-3 py-1.5 font-bold uppercase tracking-widest">Currently Out</span>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
         <div className="neo-flat p-6 flex flex-col justify-between h-full text-left">
           <div className="relative flex items-start justify-between">
             <div>
-              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Active Deposits</p>
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Pending Deposits</p>
               <h3 className="text-5xl font-black text-emerald-500 mt-4 font-mono flex items-center">
                 <IndianRupee className="w-8 h-8 -mr-1 shrink-0 text-emerald-400" />
                 {toRupees(totalPendingAdvance).toLocaleString('en-IN')}
@@ -150,7 +150,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
             </div>
           </div>
           <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center text-slate-600">
-            <span className="text-xs font-bold text-emerald-500">Held in Safe</span>
+            <span className="text-xs font-bold text-emerald-500">Deposits with us</span>
             <span className="text-[10px] neo-pressed text-emerald-600 px-3 py-1.5 font-bold uppercase tracking-widest">
               Total: {formatINR(totalActiveDeposits)}
             </span>
@@ -165,7 +165,7 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
           <div>
             <h3 className="text-xl font-bold text-[var(--color-navy)] flex items-center gap-3">
               <ClipboardList className="w-6 h-6 text-[var(--color-sky)]" />
-              Recent Rentals
+              Recent Handouts
             </h3>
             <p className="text-sm font-medium text-slate-500 mt-2">Latest items handed out to customers.</p>
           </div>

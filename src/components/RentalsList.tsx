@@ -64,7 +64,7 @@ export default function RentalsList({
   // Filter rentals
   const filteredRentals = rentals.filter((rental) => {
     const computedStatus = getRentalComputedStatus(rental);
-    
+
     const matchesSearch =
       (rental.bookingNumber && rental.bookingNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
       rental.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -94,7 +94,7 @@ export default function RentalsList({
       const outfitSummary = r.items
         .map((item) => `${item.name} [Size: ${item.size}, Qty: ${item.quantity}, Price: ${formatINR(item.rentalPrice)}]`)
         .join('; ');
-      
+
       const accessorySummary = r.additionalItems
         .map((ai) => `${ai.name} (Qty: ${ai.quantity})`)
         .join(', ');
@@ -122,7 +122,7 @@ export default function RentalsList({
     const worksheet = XLSX.utils.json_to_sheet(dataRows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Rentals Registry');
-    
+
     // Auto-fit column widths (basic)
     const maxCols = Object.keys(dataRows[0] || {}).length;
     worksheet['!cols'] = Array(maxCols).fill({ wch: 22 });
@@ -240,10 +240,10 @@ export default function RentalsList({
 
   return (
     <div className="space-y-6">
-      
+
       {/* 1. Header Filter Bar */}
       <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch md:items-center neo-flat p-6">
-        
+
         {/* Search */}
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-sky)]" />
@@ -265,13 +265,12 @@ export default function RentalsList({
               type="button"
               id={`filter-status-${filter}`}
               onClick={() => setStatusFilter(filter)}
-              className={`px-5 py-2.5 font-bold text-[10px] uppercase tracking-widest shrink-0 transition-all cursor-pointer ${
-                statusFilter === filter
+              className={`px-5 py-2.5 font-bold text-[10px] uppercase tracking-widest shrink-0 transition-all cursor-pointer ${statusFilter === filter
                   ? filter === 'pre-booked'
                     ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
                     : 'neo-pressed text-[var(--color-sky)]'
                   : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
-              }`}
+                }`}
             >
               {filter === 'pre-booked' ? 'PRE-BOOKED' : filter}
             </button>
@@ -558,19 +557,17 @@ export default function RentalsList({
           return (
             <div
               key={rental.id}
-              className={`neo-flat relative overflow-hidden transition-all flex flex-col md:flex-row justify-between group ${
-                isPreBooked
+              className={`neo-flat relative overflow-hidden transition-all flex flex-col md:flex-row justify-between group ${isPreBooked
                   ? 'ring-1 ring-amber-400'
                   : isOverdue
-                  ? 'ring-1 ring-red-400'
-                  : ''
-              }`}
+                    ? 'ring-1 ring-red-400'
+                    : ''
+                }`}
             >
               {/* Costume Tag left accent bar */}
               <div
-                className={`absolute left-0 top-0 w-2 h-full ${
-                  isPreBooked ? 'bg-amber-400' : isOverdue ? 'bg-red-400' : isReturned ? 'bg-slate-300' : 'bg-[var(--color-sky)]'
-                }`}
+                className={`absolute left-0 top-0 w-2 h-full ${isPreBooked ? 'bg-amber-400' : isOverdue ? 'bg-red-400' : isReturned ? 'bg-slate-300' : 'bg-[var(--color-sky)]'
+                  }`}
               />
 
               <div className="flex-1 p-6 pl-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
@@ -578,19 +575,18 @@ export default function RentalsList({
                 <div className="md:col-span-4 space-y-3">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span
-                      className={`text-[10px] font-bold tracking-widest uppercase px-3 py-1 neo-pressed ${
-                        isPreBooked
+                      className={`text-[10px] font-bold tracking-widest uppercase px-3 py-1 neo-pressed ${isPreBooked
                           ? 'text-amber-500'
                           : isOverdue
-                          ? 'text-red-500'
-                          : isReturned
-                          ? 'text-slate-400'
-                          : 'text-[var(--color-sky)]'
-                      }`}
+                            ? 'text-red-500'
+                            : isReturned
+                              ? 'text-slate-400'
+                              : 'text-[var(--color-sky)]'
+                        }`}
                     >
                       {isPreBooked ? 'PRE-BOOKED' : computedStatus}
                     </span>
-                    
+
                     <span className="text-[10px] font-mono font-bold text-[var(--color-navy)] uppercase tracking-widest">
                       #{rental.bookingNumber || '1000'}
                     </span>
@@ -687,7 +683,7 @@ export default function RentalsList({
 
               {/* Action Buttons Toolbar at Right side */}
               <div className="md:w-32 bg-[rgba(0,0,0,0.02)] p-4 shrink-0 flex flex-row md:flex-col justify-center gap-4 items-center border-t md:border-t-0 md:border-l border-[rgba(0,0,0,0.05)]">
-                
+
                 <div className="flex gap-2 flex-row md:flex-col w-full">
                   {/* Download PDF Invoice */}
                   <button
@@ -763,13 +759,12 @@ export default function RentalsList({
                   type="button"
                   onClick={() => handleToggleAdvance(rental)}
                   disabled={!isReturned}
-                  className={`w-full py-3 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight transition-all ${
-                    !isReturned 
-                      ? 'neo-pressed text-slate-400 opacity-50' 
-                      : rental.advanceReturned 
-                      ? 'neo-pressed text-slate-400' 
-                      : 'neo-btn text-emerald-500 hover:text-emerald-600'
-                  }`}
+                  className={`w-full py-3 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight transition-all ${!isReturned
+                      ? 'neo-pressed text-slate-400 opacity-50'
+                      : rental.advanceReturned
+                        ? 'neo-pressed text-slate-400'
+                        : 'neo-btn text-emerald-500 hover:text-emerald-600'
+                    }`}
                   title={rental.advanceReturned ? 'Refunded' : 'Refund'}
                 >
                   {rental.advanceReturned ? 'Refunded' : 'Refund'}
@@ -793,16 +788,16 @@ export default function RentalsList({
         const r = selectedRentalForView;
         const computed = getRentalComputedStatus(r);
         return (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fadeIn font-sans">
-            <div className="neo-flat max-w-2xl w-full relative overflow-hidden my-8">
-              
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-12 pb-12 overflow-y-auto animate-fadeIn font-sans">
+            <div className="neo-flat max-w-2xl w-full relative overflow-hidden my-auto">
+
               {/* Ticket Header */}
               <div className="bg-[var(--color-navy)] text-slate-100 p-8 flex justify-between items-center relative">
                 <div>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-sky)] font-bold block mb-2">ARIYA THANGAM FANCY DRESS FOR RENT</span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-2">ARIYA THANGAM FANCY DRESS FOR RENT</span>
                   <div className="flex items-center gap-3">
                     <h3 className="text-2xl font-black text-white">Invoice</h3>
-                    <span className="neo-flat text-[var(--color-navy)] font-black text-[10px] px-3 py-1 font-mono uppercase tracking-widest">
+                    <span className="neo-flat text-[var(--color-navy)] font-black text-[10px] px-3 py-1 font-mono uppercase tracking-widest border-none">
                       #{r.bookingNumber || '1000'}
                     </span>
                   </div>
@@ -814,7 +809,7 @@ export default function RentalsList({
                       generateRentalInvoicePDF(r);
                       alert(`Downloaded PDF Invoice for ${r.customerName}`, 'success');
                     }}
-                    className="flex items-center gap-2 px-4 py-2 neo-pressed text-slate-200 font-bold text-xs uppercase tracking-widest hover:text-white transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
                   >
                     <Download className="w-4 h-4" /> PDF
                   </button>
@@ -830,7 +825,7 @@ export default function RentalsList({
 
               {/* Receipt Content */}
               <div className="p-8 space-y-8">
-                
+
                 {/* Visual divider line */}
                 <div className="border-b border-[rgba(0,0,0,0.05)] pb-6 flex justify-between items-start text-sm">
                   <div>
@@ -845,9 +840,8 @@ export default function RentalsList({
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] text-slate-500 uppercase font-mono tracking-widest font-bold mb-2">Status</p>
-                    <span className={`text-[10px] font-black px-4 py-2 neo-pressed font-mono uppercase tracking-widest inline-block ${
-                      computed === 'pre-booked' ? 'text-amber-500' : computed === 'overdue' ? 'text-red-500' : computed === 'returned' ? 'text-slate-500' : 'text-[var(--color-sky)]'
-                    }`}>
+                    <span className={`text-[10px] font-black px-4 py-2 neo-pressed font-mono uppercase tracking-widest inline-block ${computed === 'pre-booked' ? 'text-amber-500' : computed === 'overdue' ? 'text-red-500' : computed === 'returned' ? 'text-slate-500' : 'text-[var(--color-sky)]'
+                      }`}>
                       {computed === 'pre-booked' ? 'PRE-BOOKED' : computed}
                     </span>
                   </div>
@@ -949,7 +943,7 @@ export default function RentalsList({
                 {(r.handoverPhotos.length > 0 || (r.returnPhotos && r.returnPhotos.length > 0)) && (
                   <div className="space-y-4">
                     <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Condition Photos</h5>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {/* Handover photos */}
                       {r.handoverPhotos.length > 0 && (
@@ -993,7 +987,7 @@ export default function RentalsList({
 
               {/* Receipt Footer printable design */}
               <div className="bg-[rgba(0,0,0,0.02)] text-center py-4 border-t border-[rgba(0,0,0,0.05)] font-mono text-[10px] text-slate-500 font-bold tracking-widest uppercase">
-                <span>THANK YOU FOR DEALING WITH MASQUERADE HUB</span>
+                <span>THANK YOU</span>
               </div>
             </div>
           </div>
