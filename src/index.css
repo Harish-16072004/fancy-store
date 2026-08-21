@@ -4,6 +4,22 @@
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-neo-bg: #e6eef4; /* Crisp cool off-white */
+  --color-neo-dark: #cbd6e2; /* Dark shadow */
+  --color-neo-light: #ffffff; /* Light shadow */
+  
+  --color-navy: #1e293b; /* Navy Blue */
+  --color-navy-dark: #0f172a;
+  
+  --color-sky: #0ea5e9; /* Sky Blue */
+  --color-sky-light: #e0f2fe;
+}
+
+/* Base Neumorphic Background */
+body {
+  background-color: var(--color-neo-bg);
+  color: var(--color-navy);
 }
 
 /* Custom fade animations */
@@ -16,8 +32,99 @@
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Enforce sharp edges for all elements */
-*, *::before, *::after {
-  border-radius: 0 !important;
+/* Loading spinner animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
+.animate-spin {
+  animation: spin 0.7s linear infinite;
+}
+
+/* Neumorphic Utilities */
+.neo-flat {
+  background-color: var(--color-neo-bg);
+  box-shadow: 8px 8px 16px var(--color-neo-dark), 
+             -8px -8px 16px var(--color-neo-light);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.neo-pressed {
+  background-color: var(--color-neo-bg);
+  box-shadow: inset 6px 6px 10px 0 var(--color-neo-dark), 
+              inset -6px -6px 10px 0 var(--color-neo-light);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neo-pressed-sm {
+  background-color: var(--color-neo-bg);
+  box-shadow: inset 3px 3px 6px 0 var(--color-neo-dark), 
+              inset -3px -3px 6px 0 var(--color-neo-light);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Neumorphic Buttons */
+.neo-btn {
+  background-color: var(--color-neo-bg);
+  box-shadow: 6px 6px 12px var(--color-neo-dark), 
+             -6px -6px 12px var(--color-neo-light);
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.neo-btn:hover {
+  box-shadow: 8px 8px 16px var(--color-neo-dark), 
+             -8px -8px 16px var(--color-neo-light);
+  transform: translateY(-1px);
+}
+
+.neo-btn:active, .neo-btn.active {
+  box-shadow: inset 4px 4px 8px 0 var(--color-neo-dark), 
+              inset -4px -4px 8px 0 var(--color-neo-light);
+  transform: translateY(1px);
+}
+
+.neo-btn-primary {
+  background: var(--color-sky);
+  box-shadow: 6px 6px 12px var(--color-neo-dark), 
+             -6px -6px 12px var(--color-neo-light);
+  color: white;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+.neo-btn-primary:hover {
+  background: #0284c7; /* darker sky */
+  transform: translateY(-1px);
+}
+.neo-btn-primary:active {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2);
+  transform: translateY(1px);
+}
+
+.neo-btn-navy {
+  background: var(--color-navy);
+  box-shadow: 6px 6px 12px var(--color-neo-dark), 
+             -6px -6px 12px var(--color-neo-light);
+  color: white;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+.neo-btn-navy:hover {
+  background: var(--color-navy-dark);
+}
+.neo-btn-navy:active {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.3);
+  transform: translateY(1px);
+}
+
+/* Custom rounded corners since we are moving away from sharp UI */
+*, *::before, *::after {
+  /* Removed the !important radius 0 rule */
+}

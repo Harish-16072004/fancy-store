@@ -216,27 +216,25 @@ export default function InventoryManager({
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex gap-4">
         <button
           type="button"
-          id="tab-view-items"
           onClick={() => setActiveTab('items')}
-          className={`px-5 py-2.5 font-bold text-sm transition-all cursor-pointer ${
+          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
             activeTab === 'items'
-              ? 'border-b-2 border-slate-900 text-slate-900 font-extrabold'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'neo-pressed text-[var(--color-navy)]'
+              : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
           }`}
         >
           Outfits / Costumes ({inventory.length})
         </button>
         <button
           type="button"
-          id="tab-view-categories"
           onClick={() => setActiveTab('categories')}
-          className={`px-5 py-2.5 font-bold text-sm transition-all cursor-pointer ${
+          className={`flex-1 px-5 py-3 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
             activeTab === 'categories'
-              ? 'border-b-2 border-slate-900 text-slate-900 font-extrabold'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'neo-pressed text-[var(--color-navy)]'
+              : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
           }`}
         >
           Categories ({categories.length})
@@ -246,28 +244,26 @@ export default function InventoryManager({
       {activeTab === 'items' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-white p-4 border border-slate-200 rounded-none shadow-sm">
+          <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch md:items-center neo-flat p-6">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-sky)]" />
               <input
                 type="text"
-                id="search-inventory"
                 placeholder="Search costume name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-none bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                className="w-full pl-12 pr-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] transition-all"
               />
             </div>
 
             {/* Category Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+            <div className="flex items-center gap-3">
+              <Filter className="w-5 h-5 text-slate-400 shrink-0" />
               <select
-                id="filter-category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3.5 py-2 border border-slate-200 rounded-none bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                className="px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] transition-all"
               >
                 <option value="all">All Categories</option>
                 {categories.map((cat) => (
@@ -279,25 +275,23 @@ export default function InventoryManager({
             </div>
 
             {/* Add New Costume Button */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-4 shrink-0">
               <button
                 type="button"
-                id="btn-export-inventory"
                 onClick={handleExportInventoryExcel}
-                className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 rounded-none font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                title="Export Costume Inventory list separately to Excel"
+                className="px-6 py-3 neo-btn text-emerald-500 hover:text-emerald-600 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer"
+                title="Export Costume Inventory list"
               >
-                <FileDown className="w-4.5 h-4.5" />
-                Export (.xlsx)
+                <FileDown className="w-5 h-5" />
+                Export
               </button>
 
               <button
                 type="button"
-                id="btn-add-costume-modal"
                 onClick={openAddItemForm}
-                className="px-4 py-2 rounded-none bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                className="px-6 py-3 neo-btn-primary font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Plus className="w-4.5 h-4.5" />
+                <Plus className="w-5 h-5" />
                 Add Outfit
               </button>
             </div>
@@ -305,35 +299,33 @@ export default function InventoryManager({
 
           {/* Costume Form (Inline Modal Style) */}
           {isItemFormOpen && (
-            <div className="p-6 bg-white border border-slate-200 rounded-none shadow-sm space-y-4 animate-fadeIn relative">
-              <h3 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
+            <div className="p-8 neo-flat space-y-6 animate-fadeIn relative">
+              <h3 className="text-2xl font-black text-[var(--color-navy)] border-b border-[rgba(0,0,0,0.05)] pb-4">
                 {editingItemId ? 'Edit Costume Outfit' : 'Add New Costume Outfit'}
               </h3>
 
-              <form onSubmit={handleSaveItem} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <form onSubmit={handleSaveItem} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Costume Name *</label>
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Costume Name *</label>
                     <input
                       type="text"
-                      id="form-item-name"
                       required
                       placeholder="e.g., Tiger Costume Deluxe"
                       value={itemName}
                       onChange={(e) => setItemName(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Category *</label>
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Category *</label>
                       <select
-                        id="form-item-category"
                         required
                         value={itemCatId}
                         onChange={(e) => setItemCatId(e.target.value)}
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                        className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                       >
                         {categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>
@@ -344,68 +336,64 @@ export default function InventoryManager({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Size *</label>
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Size *</label>
                       <input
                         type="text"
-                        id="form-item-size"
                         required
-                        placeholder="e.g., S, M, L, XL, 4-6 yrs"
+                        placeholder="e.g., S, M, L, XL"
                         value={itemSize}
                         onChange={(e) => setItemSize(e.target.value)}
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                        className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Quantity in Stock *</label>
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Quantity *</label>
                       <input
                         type="number"
-                        id="form-item-quantity"
                         required
                         min="0"
                         value={itemQty}
                         onChange={(e) => setItemQty(parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                        className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Rental Price (₹) *</label>
+                      <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Rent (₹) *</label>
                       <input
                         type="number"
-                        id="form-item-price"
                         required
                         min="0"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                        className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-[var(--color-sky)]"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4 flex flex-col justify-between">
+                <div className="space-y-6 flex flex-col justify-between">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Outfit Photo (Optional)</label>
-                    <div className="flex items-center gap-4">
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Photo</label>
+                    <div className="flex items-center gap-6">
                       {itemPhoto ? (
-                        <div className="relative w-24 h-24 rounded-none overflow-hidden border border-slate-200 shadow-xs">
-                          <img referrerPolicy="no-referrer" src={itemPhoto} alt="Upload Preview" className="w-full h-full object-cover" />
+                        <div className="relative w-32 h-32 neo-pressed overflow-hidden shrink-0">
+                          <img referrerPolicy="no-referrer" src={itemPhoto} alt="Preview" className="w-full h-full object-cover mix-blend-multiply rounded-lg" />
                           <button
                             type="button"
-                            id="btn-remove-item-photo"
                             onClick={() => setItemPhoto('')}
-                            className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-none hover:bg-red-700 shadow-xs transition-colors"
+                            className="absolute top-2 right-2 p-1.5 neo-btn text-red-500"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
-                        <div className="w-24 h-24 rounded-none bg-slate-50 flex flex-col items-center justify-center border border-dashed border-slate-200 text-slate-400">
-                          <FileImage className="w-6 h-6" />
-                          <span className="text-xxs mt-1">No Photo</span>
+                        <div className="w-32 h-32 neo-pressed flex flex-col items-center justify-center text-slate-400 shrink-0">
+                          <FileImage className="w-8 h-8 mb-2" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">No Photo</span>
                         </div>
                       )}
 
@@ -419,34 +407,28 @@ export default function InventoryManager({
                         />
                         <button
                           type="button"
-                          id="btn-upload-item-photo"
                           onClick={() => document.getElementById('file-item-photo')?.click()}
-                          className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 rounded-none text-xs font-semibold text-slate-600 transition-colors cursor-pointer"
+                          className="px-6 py-3 neo-btn font-bold text-xs uppercase tracking-widest cursor-pointer w-full"
                         >
-                          Select Image File
+                          Select Image
                         </button>
-                        <p className="text-xxs text-slate-400 mt-2">
-                          JPEG/PNG images. Will be saved in local storage. Keep image sizes small for better persistence.
-                        </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3 justify-end pt-4">
+                  <div className="flex gap-4 justify-end pt-6">
                     <button
                       type="button"
-                      id="btn-cancel-item-form"
                       onClick={() => setIsItemFormOpen(false)}
-                      className="px-3.5 py-1.5 rounded-none bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                      className="px-6 py-3 neo-btn text-slate-500 font-bold text-xs uppercase tracking-widest transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      id="btn-save-item"
-                      className="px-4 py-1.5 rounded-none bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                      className="px-6 py-3 neo-btn-primary font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors cursor-pointer"
                     >
-                      <Check className="w-4 h-4" />
+                      <Check className="w-5 h-5" />
                       Save Costume
                     </button>
                   </div>
@@ -456,7 +438,7 @@ export default function InventoryManager({
           )}
 
           {/* Costumes Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredItems.map((item) => {
               const category = categories.find((c) => c.id === item.categoryId);
               const bookedRentals = getItemBookedRentals(item.id, rentals);
@@ -466,59 +448,56 @@ export default function InventoryManager({
               return (
                 <div
                   key={item.id}
-                  id={`item-card-${item.id}`}
-                  className="bg-white border border-slate-200 rounded-none overflow-hidden shadow-xs hover:shadow-sm transition-all flex flex-col"
+                  className="neo-flat overflow-hidden transition-all flex flex-col group p-4"
                 >
                   {/* Photo area with fallback tag styling */}
-                  <div className="h-44 bg-slate-100 relative overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="h-48 neo-pressed relative overflow-hidden shrink-0 flex items-center justify-center mb-4">
                     {item.photo ? (
                       <img
                         src={item.photo}
                         alt={item.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover mix-blend-multiply rounded-lg transition-transform group-hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-tr from-slate-50 to-blue-50/30 flex flex-col items-center justify-center text-slate-300 p-4">
-                        <Sparkles className="w-10 h-10 text-slate-300 mb-1.5" />
-                        <span className="text-xs font-bold text-slate-400 tracking-wider uppercase font-mono">
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
+                        <Sparkles className="w-10 h-10 text-[var(--color-sky)] opacity-50 mb-2" />
+                        <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase font-mono">
                           {category?.name || 'No Category'}
                         </span>
                       </div>
                     )}
 
                     {/* Costume Tag Sticker Overlay */}
-                    <div className="absolute top-2.5 left-2.5 bg-slate-900 text-white font-extrabold text-xxs uppercase px-2 py-1 rounded-none shadow-xs font-mono flex items-center gap-1">
-                      <Tag className="w-3 h-3 text-sky-400" /> Size {item.size}
+                    <div className="absolute top-3 left-3 bg-[var(--color-navy)] text-white font-black text-[10px] tracking-widest uppercase px-3 py-1 shadow-md font-mono flex items-center gap-2 rounded-lg">
+                      <Tag className="w-3 h-3 text-[var(--color-sky)]" /> {item.size}
                     </div>
 
-                    <div className="absolute bottom-2.5 right-2.5 bg-slate-950/80 backdrop-blur-xs text-white font-mono font-bold text-xs px-2 py-0.5 rounded-none">
-                      ₹{item.rentalPrice} / day
+                    <div className="absolute bottom-3 right-3 bg-[var(--color-sky)] text-white font-mono font-black text-xs px-3 py-1 shadow-md rounded-lg">
+                      ₹{item.rentalPrice}/day
                     </div>
                   </div>
 
-                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                  <div className="flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="text-sm font-bold text-slate-800 line-clamp-1">{item.name}</h4>
-                      </div>
-                      <p className="text-xxs text-slate-500 mt-1 flex items-center gap-1 font-semibold">
-                        <Tag className="w-3.5 h-3.5 text-blue-700" /> {category?.name || 'Uncategorized'}
+                      <h4 className="text-lg font-black text-[var(--color-navy)] line-clamp-1">{item.name}</h4>
+                      <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1 font-bold uppercase tracking-widest">
+                        <Tag className="w-3 h-3 text-slate-400" /> {category?.name || 'Uncategorized'}
                       </p>
                     </div>
 
                     {/* Rotation schedule booking status pill */}
-                    <div className="flex items-center justify-between gap-2 text-xxs font-mono bg-slate-50 p-2 border border-slate-100">
-                      <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-between gap-2 text-[10px] font-mono neo-pressed p-3">
+                      <div className="flex items-center gap-2">
                         {bookedRentals.length > 0 ? (
-                          <span className="text-blue-800 font-bold flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-blue-600" />
+                          <span className="text-blue-500 font-bold flex items-center gap-1 uppercase tracking-widest">
+                            <Clock className="w-3 h-3 text-blue-400" />
                             {activeCount > 0 && `${activeCount} out `}
                             {prebookedCount > 0 && `(${prebookedCount} booked)`}
                           </span>
                         ) : (
-                          <span className="text-emerald-700 font-bold flex items-center gap-1">
-                            <Check className="w-3 h-3 text-emerald-600" /> 100% In Store
+                          <span className="text-emerald-500 font-bold flex items-center gap-1 uppercase tracking-widest">
+                            <Check className="w-3 h-3 text-emerald-400" /> In Store
                           </span>
                         )}
                       </div>
@@ -526,36 +505,34 @@ export default function InventoryManager({
                       <button
                         type="button"
                         onClick={() => setScheduleItem(item)}
-                        className="text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                        className="text-[var(--color-sky)] hover:text-[var(--color-navy)] font-bold flex items-center gap-1 uppercase tracking-widest cursor-pointer"
                       >
-                        <CalendarDays className="w-3 h-3" /> Schedule ({bookedRentals.length})
+                        <CalendarDays className="w-3 h-3" /> Schedule
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-2.5">
-                      <span className="text-xs font-semibold text-slate-600 flex items-center gap-1 font-mono">
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-xs font-black text-slate-500 flex items-center gap-2 font-mono uppercase tracking-widest">
                         <Hash className="w-4 h-4 text-slate-400" />
-                        Stock: {item.quantity} units
+                        Stock: {item.quantity}
                       </span>
 
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-2">
                         <button
                           type="button"
-                          id={`btn-edit-item-${item.id}`}
                           onClick={() => openEditItemForm(item)}
-                          className="p-1.5 rounded-none bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+                          className="p-2 neo-btn text-slate-400 hover:text-[var(--color-navy)] transition-colors cursor-pointer"
                           title="Edit Outfit"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
-                          id={`btn-delete-item-${item.id}`}
                           onClick={() => handleDeleteItem(item.id, item.name)}
-                          className="p-1.5 rounded-none bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                          className="p-2 neo-btn text-red-400 hover:text-red-500 transition-colors cursor-pointer"
                           title="Delete Outfit"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -565,10 +542,10 @@ export default function InventoryManager({
             })}
 
             {filteredItems.length === 0 && (
-              <div className="col-span-full py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-none">
-                <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <h3 className="text-sm font-bold text-slate-700">No Costume Outfits Found</h3>
-                <p className="text-slate-500 text-xs mt-1">Try adjusting your filters or search keywords.</p>
+              <div className="col-span-full py-16 text-center neo-pressed">
+                <AlertCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-black text-[var(--color-navy)]">No Costume Outfits Found</h3>
+                <p className="text-slate-500 text-sm mt-2 font-medium">Try adjusting your filters or search keywords.</p>
               </div>
             )}
           </div>
@@ -576,38 +553,36 @@ export default function InventoryManager({
       )}
 
       {activeTab === 'categories' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Add Category Form */}
-          <div className="p-5 bg-slate-50 border border-slate-200 rounded-none shadow-xs space-y-3">
-            <h4 className="text-sm font-bold text-slate-800">Add New Costume Category</h4>
-            <p className="text-slate-500 text-xs">
-              Create a custom section to group similar rental items. E.g., &quot;Superheroes&quot;, &quot;Halloween Special&quot;, &quot;Historical Figures&quot;.
+          <div className="p-8 neo-flat space-y-4">
+            <h4 className="text-xl font-black text-[var(--color-navy)]">New Category</h4>
+            <p className="text-slate-500 text-sm font-medium">
+              Create a custom section to group similar items (e.g. Superheroes, Historical).
             </p>
 
-            <form onSubmit={handleCatSubmit} className="flex gap-2">
+            <form onSubmit={handleCatSubmit} className="flex gap-4">
               <input
                 type="text"
-                id="input-new-cat"
                 placeholder="e.g. Traditional Costumes"
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
-                className="flex-1 px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="flex-1 px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
               <button
                 type="submit"
-                id="btn-add-category"
-                className="px-4 py-1.5 rounded-none bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                className="px-6 py-3 neo-btn-primary font-bold text-xs flex items-center gap-2 uppercase tracking-widest cursor-pointer"
               >
-                <Plus className="w-4 h-4" /> Add
+                <Plus className="w-5 h-5" /> Add
               </button>
             </form>
           </div>
 
           {/* Categories List */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-slate-800">Existing Categories</h4>
+          <div className="p-8 neo-flat space-y-6">
+            <h4 className="text-xl font-black text-[var(--color-navy)]">Categories</h4>
 
-            <div className="space-y-2">
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 hide-scrollbar">
               {categories.map((cat) => {
                 const count = inventory.filter((item) => item.categoryId === cat.id).length;
                 const isEditing = editingCatId === cat.id;
@@ -615,60 +590,54 @@ export default function InventoryManager({
                 return (
                   <div
                     key={cat.id}
-                    id={`cat-item-${cat.id}`}
-                    className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-none shadow-xs"
+                    className="flex items-center justify-between p-4 neo-pressed"
                   >
                     {isEditing ? (
-                      <div className="flex-1 flex gap-2">
+                      <div className="flex-1 flex gap-3">
                         <input
                           type="text"
-                          id={`input-edit-cat-${cat.id}`}
                           value={editingCatName}
                           onChange={(e) => setEditingCatName(e.target.value)}
-                          className="flex-1 px-2.5 py-1 border border-blue-600 rounded-none text-sm focus:outline-none"
+                          className="flex-1 px-4 py-2 neo-pressed text-sm font-bold focus:outline-none ring-1 ring-[var(--color-sky)]"
                         />
                         <button
                           type="button"
-                          id={`btn-save-cat-${cat.id}`}
                           onClick={() => handleUpdateCategorySubmit(cat.id)}
-                          className="p-1.5 bg-emerald-600 text-white rounded-none hover:bg-emerald-700 transition-colors cursor-pointer"
+                          className="p-2 neo-btn text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
                         >
-                          <Check className="w-4 h-4" />
+                          <Check className="w-5 h-5" />
                         </button>
                         <button
                           type="button"
-                          id={`btn-cancel-cat-${cat.id}`}
                           onClick={() => setEditingCatId(null)}
-                          className="p-1.5 bg-slate-100 text-slate-600 rounded-none hover:bg-slate-200 transition-colors cursor-pointer"
+                          className="p-2 neo-btn text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-5 h-5" />
                         </button>
                       </div>
                     ) : (
                       <>
-                        <div className="space-y-0.5">
-                          <span className="text-sm font-bold text-slate-800">{cat.name}</span>
-                          <span className="block text-xxs text-slate-400 font-semibold font-mono">
-                            {count} costume outfit{count !== 1 ? 's' : ''} in inventory
+                        <div className="space-y-1">
+                          <span className="text-base font-black text-[var(--color-navy)]">{cat.name}</span>
+                          <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest font-mono">
+                            {count} item{count !== 1 ? 's' : ''}
                           </span>
                         </div>
 
-                        <div className="flex gap-1">
+                        <div className="flex gap-2">
                           <button
                             type="button"
-                            id={`btn-start-edit-cat-${cat.id}`}
                             onClick={() => startEditCategory(cat)}
-                            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-none transition-colors cursor-pointer"
-                            title="Rename Category"
+                            className="p-2 neo-btn text-slate-400 hover:text-[var(--color-navy)] transition-colors cursor-pointer"
+                            title="Rename"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             type="button"
-                            id={`btn-delete-cat-${cat.id}`}
                             onClick={() => handleDeleteCat(cat.id, cat.name)}
-                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-none transition-colors cursor-pointer"
-                            title="Delete Category"
+                            className="p-2 neo-btn text-red-400 hover:text-red-500 transition-colors cursor-pointer"
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

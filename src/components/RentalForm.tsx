@@ -27,10 +27,11 @@ interface RentalFormProps {
   inventory: InventoryItem[];
   existingRentals?: Rental[];
   activeRentals?: Rental[];
-  onSaveRental?: (rental: Rental) => void;
-  onSave?: (rentalData: any) => void;
+  onSaveRental?: (rental: Omit<Rental, 'id' | 'createdAt'>) => void;
+  onSave?: (rentalData: Omit<Rental, 'id' | 'createdAt'>) => void;
   onCancel?: () => void;
   onShowToast?: (msg: string, type?: 'success' | 'info' | 'error') => void;
+  isSubmitting?: boolean;
 }
 
 export default function RentalForm({
@@ -41,7 +42,8 @@ export default function RentalForm({
   onSaveRental,
   onSave,
   onCancel,
-  onShowToast
+  onShowToast,
+  isSubmitting = false
 }: RentalFormProps) {
   const rentalsList = existingRentals || activeRentals || [];
   const handleSave = onSaveRental || onSave || (() => {});
@@ -256,8 +258,7 @@ export default function RentalForm({
       return;
     }
 
-    const newRental: Rental = {
-      id: `RET_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    const newRental: Omit<Rental, 'id' | 'createdAt'> = {
       bookingNumber: getNextBookingNumber(rentalsList),
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
@@ -274,7 +275,6 @@ export default function RentalForm({
       advanceReturned: false,
       handoverPhotos: issuePhotos,
       notes: notes.trim(),
-      createdAt: new Date().toISOString()
     };
 
     handleSave(newRental);
@@ -297,43 +297,43 @@ export default function RentalForm({
       )}
 
       {/* Header Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-none shadow-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="neo-flat p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xxs font-mono uppercase tracking-widest text-sky-400 font-extrabold">
-              Counter Terminal • Slip Entry
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-sky)] font-bold">
+              New Rental
             </span>
-            <span className="bg-amber-400 text-slate-950 font-mono text-xxs font-extrabold px-2 py-0.5 rounded-none flex items-center gap-1 shadow-xs">
+            <span className="neo-pressed text-[var(--color-navy)] font-mono text-[10px] font-bold px-3 py-1 rounded-lg flex items-center gap-1.5">
               <Hash className="w-3 h-3" /> Booking #{nextBookingNum}
             </span>
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">Issue New Rental Slip</h2>
+          <h2 className="text-3xl font-black text-[var(--color-navy)] tracking-tight">Issue Slip</h2>
         </div>
         
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-none transition-colors cursor-pointer"
+            className="px-6 py-3 neo-btn text-slate-500 font-bold text-sm shrink-0 hover:text-[var(--color-navy)]"
           >
-            Cancel Entry
+            Cancel
           </button>
         )}
       </div>
 
       {/* 00. Booking Mode & Rotation Date Range Configuration */}
-      <div className="bg-white border border-slate-200 p-5 rounded-none shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+      <div className="neo-flat p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[rgba(0,0,0,0.05)] pb-6">
           <div>
-            <span className="text-xs font-extrabold text-slate-800 block uppercase tracking-wider font-mono">
-              00. Booking Mode &amp; Rotation Period
+            <span className="text-[10px] font-bold text-[var(--color-sky)] block uppercase tracking-widest font-mono">
+              01. Order Type
             </span>
-            <p className="text-xxs text-slate-500">
-              Select order type and rotation dates. Stock availability automatically updates as per return dates of other orders.
+            <p className="text-sm font-medium text-slate-500 mt-2">
+              Select order type. Stock automatically updates based on chosen dates.
             </p>
           </div>
 
-          <div className="flex bg-slate-100 p-1 border border-slate-200 rounded-none shrink-0">
+          <div className="flex gap-4 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -343,14 +343,14 @@ export default function RentalForm({
                   setAdvanceAmount(rentalCharge);
                 }
               }}
-              className={`px-4 py-2 text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${
                 !isPreBooking
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'neo-pressed text-[var(--color-navy)]'
+                  : 'neo-btn text-slate-500'
               }`}
             >
-              <Clock className="w-3.5 h-3.5" />
-              Direct Handover (Today)
+              <Clock className="w-4 h-4" />
+              Direct Handover
             </button>
 
             <button
@@ -362,46 +362,46 @@ export default function RentalForm({
                   setAdvanceAmount(Math.max(0, rentalCharge - 200));
                 }
               }}
-              className={`px-4 py-2 text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${
                 isPreBooking
-                  ? 'bg-amber-500 text-slate-950 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
+                  : 'neo-btn text-slate-500'
               }`}
             >
-              <BookmarkCheck className="w-3.5 h-3.5" />
-              Advance Pre-Booking
+              <BookmarkCheck className="w-4 h-4" />
+              Pre-Booking
             </button>
           </div>
         </div>
 
         {/* Date Range Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-slate-50 p-4 border border-slate-200">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-5">
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-blue-700" />
-              {isPreBooking ? 'Scheduled Pickup Date *' : 'Handover / Issue Date *'}
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[var(--color-sky)]" />
+              {isPreBooking ? 'Pickup Date *' : 'Handover Date *'}
             </label>
             <input
               type="date"
               required
               value={dateGiven}
               onChange={(e) => setDateGiven(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-none text-sm font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+              className="w-full neo-pressed px-4 py-3 text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
             />
           </div>
 
-          <div className="md:col-span-2 flex flex-col items-center justify-center text-center py-1">
-            <span className="text-[10px] uppercase font-mono font-extrabold text-slate-400">Duration</span>
-            <div className="text-xs font-black font-mono text-blue-800 bg-blue-100 px-2 py-0.5 mt-0.5 flex items-center gap-1">
-              <ArrowRight className="w-3 h-3 text-blue-600" />
+          <div className="md:col-span-2 flex flex-col items-center justify-center text-center py-2">
+            <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-widest">Duration</span>
+            <div className="text-xs font-bold font-mono text-[var(--color-sky)] neo-pressed px-3 py-1.5 mt-2 flex items-center gap-2">
+              <ArrowRight className="w-3 h-3" />
               {rentalDurationDays} Day{rentalDurationDays !== 1 ? 's' : ''}
             </div>
           </div>
 
           <div className="md:col-span-5">
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-emerald-700" />
-              Scheduled Return Date *
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-emerald-500" />
+              Return Date *
             </label>
             <input
               type="date"
@@ -409,95 +409,77 @@ export default function RentalForm({
               value={expectedReturnDate}
               min={dateGiven}
               onChange={(e) => setExpectedReturnDate(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-none text-sm font-bold font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+              className="w-full neo-pressed px-4 py-3 text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
             />
           </div>
         </div>
-
-        {/* Live Rotation availability indicator banner */}
-        <div className="bg-blue-50/60 border border-blue-100 p-2.5 flex items-center justify-between text-xxs font-mono text-slate-700">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>
-              <strong>Rotation Engine Active:</strong> Showing dresses available from{' '}
-              <strong className="text-blue-900">{dateGiven}</strong> to{' '}
-              <strong className="text-blue-900">{expectedReturnDate}</strong>.
-            </span>
-          </div>
-          <span className="text-slate-500 italic hidden sm:inline">
-            Returned on date X is instantly available for next customer picking up on date X.
-          </span>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT COLUMN: Customer and Costume Selectors (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-8">
           
           {/* 1. Customer Information Ticket Card */}
-          <div className="bg-white border border-slate-200 p-5 rounded-none shadow-xs relative">
-            <div className="absolute top-0 left-6 -translate-y-1/2 bg-slate-900 text-white font-bold px-2.5 py-0.5 rounded-none text-xxs uppercase tracking-wider font-mono">
-              01. Customer File
+          <div className="neo-flat p-8 relative">
+            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
+              02. Customer Info
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Customer Full Name *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Customer Name *</label>
                 <input
                   type="text"
-                  id="rent-customer-name"
                   required
-                  placeholder="Enter Customer Name"
+                  placeholder="Full Name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 bg-slate-50/50"
+                  className="w-full neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Customer Phone Number *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Phone Number *</label>
                 <input
                   type="tel"
-                  id="rent-customer-phone"
                   required
-                  placeholder="Enter Phone/Mobile"
+                  placeholder="Mobile"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 bg-slate-50/50"
+                  className="w-full neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">Customer Address / Location</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Address / Location</label>
                 <input
                   type="text"
-                  id="rent-customer-address"
-                  placeholder="Enter House No., Street, Area, City"
+                  placeholder="Street, Area, City"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 bg-slate-50/50"
+                  className="w-full neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                 />
               </div>
             </div>
           </div>
 
           {/* 2. Costume Inventory Select Ticket Card */}
-          <div className="bg-white border border-slate-200 p-5 rounded-none shadow-xs relative space-y-4">
-            <div className="absolute top-0 left-6 -translate-y-1/2 bg-slate-900 text-white font-bold px-2.5 py-0.5 rounded-none text-xxs uppercase tracking-wider font-mono">
-              02. Outfit Selector &amp; Rotation Stock
+          <div className="neo-flat p-8 relative space-y-6">
+            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
+              03. Items
             </div>
 
             {/* Date Conflict Warning Banner if dates changed after selecting */}
             {conflictingItems.length > 0 && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-800 text-xs rounded-none flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="p-4 neo-pressed ring-2 ring-red-400 text-red-600 text-xs flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 shrink-0" />
                 <div>
-                  <strong className="font-bold">Stock Conflict for Chosen Dates:</strong>
-                  <ul className="list-disc list-inside mt-1 space-y-0.5 text-xxs">
+                  <strong className="font-bold">Stock Conflict:</strong>
+                  <ul className="list-disc list-inside mt-2 space-y-1 text-[10px] font-medium tracking-wide">
                     {conflictingItems.map(({ item, selected, available }) => (
                       <li key={item.id}>
-                        <strong>{item.name}</strong>: Selected {selected} unit(s), but only {available} free between {dateGiven} and {expectedReturnDate}.
+                        <strong>{item.name}</strong>: Selected {selected}, only {available} free.
                       </li>
                     ))}
                   </ul>
@@ -505,18 +487,18 @@ export default function RentalForm({
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-2 mt-2 pt-1">
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
               <input
                 type="text"
-                placeholder="Search outfits by name..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-3 py-1.5 border border-slate-200 rounded-none text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 bg-slate-50/50"
+                className="flex-1 neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
               <select
                 value={selectedCategoryFilter}
                 onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 border border-slate-200 rounded-none text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 bg-slate-50/50 font-bold"
+                className="neo-pressed px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] appearance-none cursor-pointer"
               >
                 <option value="all">All Categories</option>
                 {categories.map(c => (
@@ -526,7 +508,7 @@ export default function RentalForm({
             </div>
 
             {/* Inventory Items Pick List */}
-            <div className="max-h-80 overflow-y-auto space-y-2 pr-1 border border-slate-100 rounded-none p-2 bg-slate-50/50">
+            <div className="max-h-96 overflow-y-auto space-y-4 pr-2 custom-scrollbar p-2">
               {inventory
                 .filter(item => {
                   const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -544,83 +526,75 @@ export default function RentalForm({
                   return (
                     <div 
                       key={item.id} 
-                      className={`p-2.5 bg-white border rounded-none flex items-center justify-between text-xs transition-all ${
-                        selectedQty > 0 ? 'border-blue-500 shadow-xs ring-1 ring-blue-400/30' : 'border-slate-200 hover:border-slate-300'
+                      className={`p-4 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                        selectedQty > 0 ? 'neo-flat ring-2 ring-[var(--color-sky)]' : 'neo-btn'
                       }`}
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 text-sm">{item.name}</span>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-[var(--color-navy)] text-base">{item.name}</span>
                           <button
                             type="button"
                             onClick={() => setInspectScheduleItem(item)}
-                            className="text-[10px] text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-1.5 py-0.5 rounded-none font-mono flex items-center gap-1 cursor-pointer"
-                            title="Inspect complete rotation schedule for this outfit"
+                            className="text-[10px] neo-pressed text-[var(--color-sky)] px-2 py-1 font-bold tracking-widest uppercase flex items-center gap-1.5"
+                            title="Schedule"
                           >
-                            <CalendarDays className="w-3 h-3" />
-                            Schedule ({bookedRentalsCount})
+                            <CalendarDays className="w-3.5 h-3.5" />
+                            ({bookedRentalsCount})
                           </button>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 items-center text-xxs font-semibold">
-                          <span className="text-blue-800 bg-blue-50 px-1.5 py-0.5 rounded-none border border-blue-100">
-                            {cat?.name || 'Category'}
-                          </span>
-                          <span className="text-slate-500">Size: {item.size}</span>
-                          <span className="text-emerald-700 font-mono font-bold">₹{item.rentalPrice}/day</span>
+                        <div className="flex flex-wrap gap-3 items-center text-[10px] font-bold tracking-widest uppercase">
+                          <span className="text-slate-500">{cat?.name}</span>
+                          <span className="text-slate-500">Size {item.size}</span>
+                          <span className="text-emerald-500 font-mono">₹{item.rentalPrice}/d</span>
                           
-                          {/* Available in this date window badge */}
                           <span
-                            className={`px-2 py-0.5 rounded-none font-mono font-bold ${
+                            className={`px-3 py-1 neo-pressed ${
                               remaining <= 0
-                                ? 'bg-red-100 text-red-700 border border-red-200'
+                                ? 'text-red-500'
                                 : remaining < totalStoreStock
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                ? 'text-amber-500'
+                                : 'text-emerald-500'
                             }`}
                           >
-                            {remaining <= 0
-                              ? `0 / ${totalStoreStock} Avail (Booked in window)`
-                              : `Avail: ${remaining} of ${totalStoreStock}`}
+                            Avail {remaining}/{totalStoreStock}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-3 shrink-0">
                         {selectedQty > 0 ? (
-                          <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-none px-2 py-0.5">
+                          <div className="flex items-center gap-3 neo-pressed px-3 py-1.5">
                             <button
                               type="button"
-                              id={`btn-form-dec-${item.id}`}
                               onClick={() => handleDecrementCostume(item.id)}
-                              className="text-blue-700 hover:text-blue-900 cursor-pointer"
+                              className="text-slate-400 hover:text-[var(--color-navy)] cursor-pointer"
                             >
-                              <MinusCircle className="w-4 h-4" />
+                              <MinusCircle className="w-5 h-5" />
                             </button>
-                            <span className="font-mono font-bold text-sm text-slate-900 w-4 text-center">{selectedQty}</span>
+                            <span className="font-mono font-bold text-base text-[var(--color-navy)] w-6 text-center">{selectedQty}</span>
                             <button
                               type="button"
-                              id={`btn-form-inc-${item.id}`}
                               onClick={() => handleAddCostume(item.id)}
                               disabled={!canAdd}
-                              className="text-blue-700 hover:text-blue-900 disabled:opacity-30 cursor-pointer"
+                              className="text-slate-400 hover:text-[var(--color-navy)] disabled:opacity-30 cursor-pointer"
                             >
-                              <PlusCircle className="w-4 h-4" />
+                              <PlusCircle className="w-5 h-5" />
                             </button>
                           </div>
                         ) : (
                           <button
                             type="button"
-                            id={`btn-form-add-${item.id}`}
                             onClick={() => handleAddCostume(item.id)}
                             disabled={remaining <= 0}
-                            className={`px-3 py-1.5 rounded-none font-bold text-xxs transition-all cursor-pointer ${
+                            className={`px-5 py-2.5 font-bold text-[10px] tracking-widest uppercase transition-all cursor-pointer ${
                               remaining <= 0
-                                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                                : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xs'
+                                ? 'neo-pressed text-slate-400 cursor-not-allowed'
+                                : 'neo-btn text-[var(--color-navy)]'
                             }`}
                           >
-                            {remaining <= 0 ? 'Booked' : '+ Select'}
+                            {remaining <= 0 ? 'Out' : 'Select'}
                           </button>
                         )}
                       </div>
@@ -631,59 +605,54 @@ export default function RentalForm({
           </div>
 
           {/* 3. Repeatable Additional Accessories Card */}
-          <div className="bg-white border border-slate-200 p-5 rounded-none shadow-xs relative space-y-4">
-            <div className="absolute top-0 left-6 -translate-y-1/2 bg-slate-900 text-white font-bold px-2.5 py-0.5 rounded-none text-xxs uppercase tracking-wider font-mono">
-              03. Additional Accessories (Custom)
+          <div className="neo-flat p-8 relative space-y-6">
+            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
+              04. Accessories
             </div>
 
-            <p className="text-xxs text-slate-400 pt-1">
-              Add extra customized elements not stored in standard inventory, like &quot;1 belt&quot;, &quot;sword prop&quot;, &quot;caps&quot;, etc.
+            <p className="text-xs font-medium text-slate-500 mt-2">
+              Add extra custom elements (props, belts, caps).
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               {additionalItems.map((item, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
+                <div key={idx} className="flex gap-4 items-center">
                   <input
                     type="text"
-                    id={`add-item-name-${idx}`}
-                    placeholder="e.g. Extra sword prop, Belt, Crown"
+                    placeholder="E.g. Extra sword, Belt"
                     value={item.name}
                     onChange={(e) => updateAdditionalItem(idx, 'name', e.target.value)}
-                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-none text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                    className="flex-1 neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                   />
-                  <div className="w-20 shrink-0 flex items-center border border-slate-200 rounded-none bg-slate-50">
+                  <div className="w-24 shrink-0 flex items-center neo-pressed p-1">
                     <button
                       type="button"
-                      id={`btn-dec-add-qty-${idx}`}
                       onClick={() => updateAdditionalItem(idx, 'quantity', Math.max(1, item.quantity - 1))}
-                      className="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 font-bold"
+                      className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-lg"
                     >
                       -
                     </button>
                     <input
                       type="number"
-                      id={`add-item-qty-${idx}`}
                       min="1"
                       value={item.quantity}
                       onChange={(e) => updateAdditionalItem(idx, 'quantity', parseInt(e.target.value) || 1)}
-                      className="w-full text-center bg-transparent border-none text-xs font-bold font-mono focus:outline-none"
+                      className="w-full text-center bg-transparent border-none text-sm font-bold font-mono focus:outline-none"
                     />
                     <button
                       type="button"
-                      id={`btn-inc-add-qty-${idx}`}
                       onClick={() => updateAdditionalItem(idx, 'quantity', item.quantity + 1)}
-                      className="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 font-bold"
+                      className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-lg"
                     >
                       +
                     </button>
                   </div>
                   <button
                     type="button"
-                    id={`btn-remove-add-item-${idx}`}
                     onClick={() => removeAdditionalItemField(idx)}
-                    className="p-1.5 bg-red-50 text-red-600 rounded-none hover:bg-red-100 shrink-0 transition-colors"
+                    className="p-3 neo-btn text-red-500 shrink-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               ))}
@@ -691,12 +660,11 @@ export default function RentalForm({
 
             <button
               type="button"
-              id="btn-add-accessory-field"
               onClick={addAdditionalItemField}
-              className="py-2 px-3 rounded-none border border-dashed border-slate-300 hover:border-blue-600 text-slate-600 hover:text-blue-800 font-bold text-xs w-full flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              className="py-3 px-4 neo-btn text-slate-500 hover:text-[var(--color-sky)] font-bold text-[10px] tracking-widest uppercase w-full flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add Accessory / Custom Item
+              Add Custom Prop
             </button>
           </div>
         </div>
@@ -705,27 +673,31 @@ export default function RentalForm({
         <div className="lg:col-span-5 space-y-6">
 
           {/* Checkout Invoice Box */}
-          <div className="bg-slate-900 text-white rounded-none p-5 shadow-xs border-t-4 border-blue-600 relative">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                <span className="font-mono text-xxs uppercase tracking-wider text-slate-400">Rental Ticket Summary</span>
-                <span className="text-xxs bg-blue-600 text-white font-black px-1.5 py-0.5 rounded-none font-mono">DRAFT</span>
+          <div className="neo-pressed p-8 relative">
+            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
+              Slip Summary
+            </div>
+
+            <div className="space-y-6 mt-4">
+              <div className="flex items-center justify-between border-b border-[rgba(0,0,0,0.05)] pb-4">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">Ticket</span>
+                <span className="text-[10px] font-bold text-[var(--color-sky)] neo-flat px-3 py-1 uppercase tracking-widest font-mono">DRAFT</span>
               </div>
 
               {/* Rented Outfits Listed */}
-              <div className="space-y-2">
-                <p className="text-xxs font-bold text-slate-400 uppercase tracking-wider font-mono">Rented Costumes</p>
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Cart</p>
                 {Object.keys(selectedItems).length === 0 ? (
-                  <p className="text-slate-500 text-xs italic">No costume items selected yet</p>
+                  <p className="text-slate-400 text-sm italic font-medium">Cart is empty</p>
                 ) : (
-                  <div className="space-y-1.5">
+                  <div className="space-y-3">
                     {Object.entries(selectedItems).map(([id, q]) => {
                       const item = inventory.find(i => i.id === id);
                       if (!item) return null;
                       return (
-                        <div key={id} className="flex justify-between items-center text-xs bg-slate-950 p-2 rounded-none border border-slate-800">
-                          <span className="font-bold text-slate-200">{item.name} <span className="text-slate-400 font-mono">({q}x)</span></span>
-                          <p className="font-bold text-sky-400 font-mono">₹{(Number(item.rentalPrice) || 0) * (Number(q) || 0)}</p>
+                        <div key={id} className="flex justify-between items-center text-sm neo-flat p-4">
+                          <span className="font-bold text-[var(--color-navy)]">{item.name} <span className="text-slate-400 font-mono">({q}x)</span></span>
+                          <p className="font-bold text-[var(--color-sky)] font-mono">₹{(Number(item.rentalPrice) || 0) * (Number(q) || 0)}</p>
                         </div>
                       );
                     })}
@@ -734,22 +706,22 @@ export default function RentalForm({
               </div>
 
               {/* Handover / Return Dates in Invoice */}
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-                <div className="bg-slate-950 p-2.5 border border-slate-800">
-                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Pickup Date</span>
-                  <span className="font-bold font-mono text-sky-400 text-xs">{dateGiven}</span>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[rgba(0,0,0,0.05)]">
+                <div className="neo-flat p-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Pickup</span>
+                  <span className="font-bold font-mono text-[var(--color-sky)] text-sm">{dateGiven}</span>
                 </div>
-                <div className="bg-slate-950 p-2.5 border border-slate-800">
-                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Return Date</span>
-                  <span className="font-bold font-mono text-emerald-400 text-xs">{expectedReturnDate}</span>
+                <div className="neo-flat p-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Return</span>
+                  <span className="font-bold font-mono text-emerald-500 text-sm">{expectedReturnDate}</span>
                 </div>
               </div>
 
               {/* Financial Charges Input */}
-              <div className="space-y-3 pt-2 border-t border-slate-800">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-6 pt-4 border-t border-[rgba(0,0,0,0.05)]">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xxs text-slate-400 mb-1">Rent Charge (₹)</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Rent (₹)</label>
                     <input
                       type="number"
                       required
@@ -762,13 +734,13 @@ export default function RentalForm({
                           setAdvanceAmount(isPreBooking ? Math.max(0, newRent - 200) : newRent);
                         }
                       }}
-                      className="w-full bg-slate-950 border border-slate-800 px-2 py-1.5 rounded-none text-sm font-bold text-sky-400 font-mono focus:outline-none"
+                      className="w-full neo-flat px-4 py-3 text-sm font-bold text-[var(--color-sky)] font-mono focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xxs text-slate-400 mb-1">
-                      {isPreBooking ? 'Refundable Deposit (Rent - ₹200)' : 'Refundable Deposit (₹)'}
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                      {isPreBooking ? 'Deposit (-₹200)' : 'Deposit (₹)'}
                     </label>
                     <input
                       type="number"
@@ -779,63 +751,53 @@ export default function RentalForm({
                         setIsAdvanceManuallyEdited(true);
                         setAdvanceAmount(parseInt(e.target.value) || 0);
                       }}
-                      className="w-full bg-slate-950 border border-slate-800 px-2 py-1.5 rounded-none text-sm font-bold text-emerald-400 font-mono focus:outline-none"
+                      className="w-full neo-flat px-4 py-3 text-sm font-bold text-emerald-500 font-mono focus:outline-none"
                     />
                   </div>
                 </div>
 
                 {/* Pre-Booking Token Paid Today Field */}
                 {isPreBooking && (
-                  <div className="bg-amber-950/40 border border-amber-500/40 p-3 rounded-none space-y-1.5">
+                  <div className="neo-flat ring-1 ring-amber-400/50 p-5 space-y-4">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xxs font-bold uppercase tracking-wider text-amber-300 font-mono">
-                        Pre-Booking Token Paid Today (₹)
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-amber-600">
+                        Token Paid (₹)
                       </label>
-                      <span className="text-xxs bg-amber-400 text-slate-950 px-1 font-bold font-mono">DEFAULT ₹200</span>
+                      <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-lg font-bold">DEFAULT ₹200</span>
                     </div>
                     <input
                       type="number"
                       required
                       min="0"
-                      placeholder="Default ₹200"
+                      placeholder="200"
                       value={preBookingPaid}
                       onChange={(e) => setPreBookingPaid(parseInt(e.target.value) || 0)}
-                      className="w-full bg-slate-950 border border-amber-500/50 px-3 py-2 rounded-none text-base font-extrabold text-amber-300 font-mono focus:outline-none focus:border-amber-400"
+                      className="w-full neo-pressed px-4 py-3 text-base font-extrabold text-amber-600 font-mono focus:outline-none"
                     />
-                    <p className="text-xxs text-amber-200/80 italic">
-                      Default token amount is ₹200. Collected right now to reserve the costume in advance.
-                    </p>
                   </div>
                 )}
 
-                {/* Info Text about pre-booking rule */}
-                <p className="text-xxs text-slate-400 italic font-mono">
-                  {isPreBooking 
-                    ? `Pre-Booking Rule: Default token = ₹200. Refundable deposit = (Rent ₹${rentalCharge} - ₹200) = ₹${advanceAmount}.`
-                    : 'Direct Handover Rule: Refundable deposit is equal to rental charge. Total collected upfront = Rent + Deposit.'}
-                </p>
-
                 {/* Total & Remaining Balance Summary */}
-                <div className="bg-slate-950 p-3 border border-slate-800 rounded-none space-y-1.5">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span>Total Order Cost (Rent + Deposit):</span>
-                    <span className="font-mono font-bold">₹{totalUpfront}</span>
+                <div className="neo-flat p-5 space-y-3">
+                  <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    <span>Order Total:</span>
+                    <span className="font-mono text-[var(--color-navy)]">₹{totalUpfront}</span>
                   </div>
 
                   {isPreBooking ? (
                     <>
-                      <div className="flex justify-between text-xs text-amber-300 font-bold">
-                        <span>Paid Today (Token):</span>
+                      <div className="flex justify-between text-xs font-bold text-amber-600 uppercase tracking-widest">
+                        <span>Paid Token:</span>
                         <span className="font-mono">₹{preBookingPaid}</span>
                       </div>
-                      <div className="flex justify-between text-sm font-extrabold text-sky-400 border-t border-slate-800 pt-1.5">
-                        <span>Remaining Balance at Handover:</span>
+                      <div className="flex justify-between text-sm font-black text-[var(--color-sky)] border-t border-[rgba(0,0,0,0.05)] pt-3">
+                        <span className="uppercase tracking-widest">Due at Pickup:</span>
                         <span className="font-mono">₹{Math.max(0, totalUpfront - preBookingPaid)}</span>
                       </div>
                     </>
                   ) : (
-                    <div className="flex justify-between text-sm font-extrabold text-emerald-400 border-t border-slate-800 pt-1.5">
-                      <span>Total Collected Today:</span>
+                    <div className="flex justify-between text-sm font-black text-emerald-500 border-t border-[rgba(0,0,0,0.05)] pt-3">
+                      <span className="uppercase tracking-widest">Collect Today:</span>
                       <span className="font-mono">₹{totalUpfront}</span>
                     </div>
                   )}
@@ -843,42 +805,55 @@ export default function RentalForm({
               </div>
 
               {/* Notes */}
-              <div className="border-t border-slate-800 pt-3 space-y-1">
-                <label className="text-xxs text-slate-400 flex items-center gap-1">
-                  <Notebook className="w-3.5 h-3.5 text-slate-500" /> Optional Handover Notes
+              <div className="border-t border-[rgba(0,0,0,0.05)] pt-6 space-y-3">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  <Notebook className="w-4 h-4 text-[var(--color-sky)]" /> Handover Notes
                 </label>
                 <textarea
-                  placeholder="Damage annotations, costume accessories notes, special agreements..."
+                  placeholder="Annotations, damage notes..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-none text-xs text-slate-100 p-2 focus:outline-none focus:border-blue-600"
+                  className="w-full neo-pressed p-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                 />
               </div>
 
               {/* Complete Handover Save Trigger */}
-              <div className="pt-2">
+              <div className="pt-4">
                 <button
                   type="submit"
-                  id="btn-save-new-rental"
-                  disabled={conflictingItems.length > 0}
-                  className="w-full py-3 rounded-none bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 active:scale-[0.98] transition-all text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md disabled:cursor-not-allowed"
+                  disabled={conflictingItems.length > 0 || isSubmitting}
+                  className="w-full py-4 neo-btn-primary disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
                 >
-                  <Save className="w-4 h-4" />
-                  {isPreBooking
-                    ? `Save Pre-Booking Slip (Collect ₹${preBookingPaid} Token)`
-                    : `Save & Handover (Collect ₹${totalUpfront})`}
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      {isPreBooking
+                        ? `Save Pre-Booking (₹${preBookingPaid})`
+                        : `Complete Handover (₹${totalUpfront})`}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
           </div>
 
           {/* Handover Camera condition photos */}
-          <div className="bg-white border border-slate-200 p-5 rounded-none shadow-xs">
+          <div className="neo-flat p-8">
+            <div className="mb-4">
+              <span className="text-[10px] font-bold text-[var(--color-sky)] uppercase tracking-widest font-mono">
+                05. Condition Photos
+              </span>
+            </div>
             <CameraCapture
               photos={issuePhotos}
               onChange={setIssuePhotos}
-              label="Attach Handover Condition Photos"
+              label="Attach Handover Photos"
               maxPhotos={5}
             />
           </div>

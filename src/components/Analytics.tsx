@@ -183,106 +183,106 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
   return (
     <div className="space-y-8 animate-fadeIn pb-12">
       
-      {/* Header Banner - Dark Blue Navy Theme */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-none p-6 md:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-none blur-3xl pointer-events-none"></div>
+      {/* Header Banner */}
+      <div className="neo-flat p-8 relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[var(--color-sky)] opacity-10 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-400/20 text-sky-300 px-3 py-1 rounded-none text-xs font-mono font-bold uppercase tracking-wider">
-              <BarChart3 className="w-3.5 h-3.5 text-sky-400" />
-              Unified Financials & Analytics
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 neo-pressed text-[var(--color-navy)] px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider">
+              <BarChart3 className="w-4 h-4 text-[var(--color-sky)]" />
+              Unified Financials
             </div>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white">
-              Revenue, Peak Seasons & Billing Statements
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[var(--color-navy)]">
+              Revenue & Insights
             </h2>
-            <p className="text-slate-300 text-xs md:text-sm max-w-2xl leading-relaxed">
-              Complete consolidated financial hub: track peak sales months, analyze repeatedly rented costumes, examine revenue metrics, and export period bills.
+            <p className="text-slate-500 text-sm max-w-2xl font-medium">
+              Track peak sales months, analyze top-performing costumes, examine revenue metrics, and export precise period statements.
             </p>
           </div>
 
           <button
             type="button"
             onClick={handleDownloadPDFReport}
-            className="self-start md:self-auto flex items-center gap-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-3 rounded-none shadow-lg shadow-blue-900/30 transition-all hover:scale-[1.02] cursor-pointer shrink-0 border border-blue-400/30"
+            className="self-start md:self-auto neo-btn-primary font-bold text-xs px-6 py-4 flex items-center gap-2 uppercase tracking-widest cursor-pointer shrink-0"
           >
-            <Download className="w-4 h-4 text-sky-200" />
+            <Download className="w-5 h-5" />
             Export Statement PDF
           </button>
         </div>
       </div>
 
       {/* --- SECTION 1: ALL FINANCIAL METRIC KPI CARDS --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Total Booked Revenue */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-xs relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-xxs font-black uppercase tracking-wider">Total Booked Revenue</p>
-            <span className="text-blue-700 bg-blue-50 p-2 rounded-none">
-              <TrendingUp className="w-4 h-4" />
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Total Booked</p>
+            <span className="text-[var(--color-navy)] neo-pressed p-2">
+              <TrendingUp className="w-5 h-5 text-[var(--color-sky)]" />
             </span>
           </div>
-          <div className="mt-3">
-            <h4 className="text-3xl font-black text-slate-900 font-mono">
+          <div>
+            <h4 className="text-3xl font-black text-[var(--color-navy)] font-mono">
               ₹{totalBookedRevenue}
             </h4>
-            <p className="text-[10px] text-slate-500 font-bold mt-1">
-              Net rental fees ({rentals.length} bookings, excludes refunded deposit)
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
+              Net fees ({rentals.length} bookings)
             </p>
           </div>
         </div>
 
         {/* Realized Revenue */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-xs relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-xxs font-black uppercase tracking-wider">Realized Cash Revenue</p>
-            <span className="text-emerald-600 bg-emerald-50 p-2 rounded-none">
-              <CheckCircle className="w-4 h-4" />
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Realized Cash</p>
+            <span className="text-emerald-500 neo-pressed p-2">
+              <CheckCircle className="w-5 h-5" />
             </span>
           </div>
-          <div className="mt-3">
-            <h4 className="text-3xl font-black text-emerald-600 font-mono">
+          <div>
+            <h4 className="text-3xl font-black text-emerald-500 font-mono">
               ₹{realizedRevenue}
             </h4>
-            <p className="text-[10px] text-slate-500 font-bold mt-1">
-              Settled on returned costumes
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
+              Settled & Returned
             </p>
           </div>
         </div>
 
         {/* Ongoing Revenue */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-xs relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-xxs font-black uppercase tracking-wider">Ongoing In-Field Rent</p>
-            <span className="text-sky-700 bg-sky-50 p-2 rounded-none">
-              <Activity className="w-4 h-4" />
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Active Rent</p>
+            <span className="text-blue-500 neo-pressed p-2">
+              <Activity className="w-5 h-5" />
             </span>
           </div>
-          <div className="mt-3">
-            <h4 className="text-3xl font-black text-sky-700 font-mono">
+          <div>
+            <h4 className="text-3xl font-black text-blue-500 font-mono">
               ₹{activeRevenue}
             </h4>
-            <p className="text-[10px] text-slate-500 font-bold mt-1">
-              Committed on active rentals
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
+              In-field items
             </p>
           </div>
         </div>
 
         {/* Average Order Value */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-xs relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-xxs font-black uppercase tracking-wider">Average Order Value (AOV)</p>
-            <span className="text-amber-600 bg-amber-50 p-2 rounded-none">
-              <Percent className="w-4 h-4" />
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Avg Ticket (AOV)</p>
+            <span className="text-[var(--color-navy)] neo-pressed p-2">
+              <Percent className="w-5 h-5 text-amber-500" />
             </span>
           </div>
-          <div className="mt-3">
-            <h4 className="text-3xl font-black text-slate-900 font-mono">
+          <div>
+            <h4 className="text-3xl font-black text-[var(--color-navy)] font-mono">
               ₹{avgTicketSize}
             </h4>
-            <p className="text-[10px] text-slate-500 font-bold mt-1">
-              Average spend per customer rental ticket
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">
+              Spend / Booking
             </p>
           </div>
         </div>
@@ -290,69 +290,69 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
       </div>
 
       {/* --- SECTION 2: PEAK INSIGHT HIGHLIGHT CARDS --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Peak Season Card */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-sm relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Peak Sales Month</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-none">
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Peak Sales Month</span>
+            <div className="neo-pressed p-2 text-amber-500">
               <Flame className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-3xl font-black text-slate-900 font-mono tracking-tight">
+          <div>
+            <p className="text-3xl font-black text-[var(--color-navy)] font-mono tracking-tight">
               {peakMonth.month}
             </p>
-            <p className="text-xs font-bold text-emerald-600 mt-1 flex items-center gap-1">
-              <ArrowUpRight className="w-3.5 h-3.5" />
-              Peak Revenue: ₹{peakMonth.revenue} ({peakMonth.count} orders)
+            <p className="text-xs font-bold text-emerald-500 mt-2 flex items-center gap-1 uppercase tracking-widest">
+              <ArrowUpRight className="w-4 h-4" />
+              ₹{peakMonth.revenue} ({peakMonth.count} orders)
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xxs font-semibold text-slate-500">
-            Stock demand surges highest during this period.
+          <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            Highest stock demand period.
           </div>
         </div>
 
         {/* Most Repeatedly Rented Costume Card */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-sm relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Most Rented Costume</span>
-            <div className="p-2 bg-blue-50 text-blue-700 rounded-none">
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Top Costume</span>
+            <div className="neo-pressed p-2 text-[var(--color-sky)]">
               <Award className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-xl font-black text-slate-900 leading-snug truncate">
+          <div>
+            <p className="text-xl font-black text-[var(--color-navy)] leading-snug line-clamp-2">
               {topRepeatedOutfits[0]?.name || 'N/A'}
             </p>
-            <p className="text-xs font-bold text-blue-700 mt-1 font-mono">
-              Rented {topRepeatedOutfits[0]?.count || 0} times • Earned ₹{topRepeatedOutfits[0]?.totalRevenue || 0}
+            <p className="text-[10px] font-bold text-[var(--color-sky)] mt-2 font-mono uppercase tracking-widest">
+              {topRepeatedOutfits[0]?.count || 0} times • ₹{topRepeatedOutfits[0]?.totalRevenue || 0}
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xxs font-semibold text-slate-500">
-            Top customer favorite costume in stock.
+          <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            Customer favorite outfit.
           </div>
         </div>
 
         {/* Total Lifetime Bookings */}
-        <div className="bg-white border border-slate-200 rounded-none p-5 shadow-sm relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Total Handovers Logged</span>
-            <div className="p-2 bg-slate-100 text-slate-800 rounded-none">
+        <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Handovers</span>
+            <div className="neo-pressed p-2 text-[var(--color-navy)]">
               <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-3xl font-black text-slate-900 font-mono">
+          <div>
+            <p className="text-3xl font-black text-[var(--color-navy)] font-mono">
               {rentals.length} Tickets
             </p>
-            <p className="text-xs font-bold text-slate-600 mt-1">
-              Across {inventory.length} costume styles in inventory
+            <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">
+              Across {inventory.length} styles
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xxs font-semibold text-slate-500">
-            Recorded in local shop database.
+          <div className="mt-6 pt-4 border-t border-[rgba(0,0,0,0.05)] text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            All-time database logs.
           </div>
         </div>
 
@@ -362,18 +362,18 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Peak Season Area Chart (7 Cols) */}
-        <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm lg:col-span-7 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-800" />
-                Peak Season & Monthly Trend
+        <div className="neo-flat p-8 lg:col-span-7 flex flex-col justify-between">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xl font-black text-[var(--color-navy)] tracking-wide flex items-center gap-3">
+                <Calendar className="w-6 h-6 text-[var(--color-sky)]" />
+                Monthly Revenue Trend
               </h3>
-              <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-100 font-bold px-2.5 py-1 rounded-none uppercase">
-                Revenue Curve
+              <span className="text-[10px] neo-pressed text-[var(--color-sky)] font-bold px-3 py-1.5 uppercase tracking-widest">
+                Curve
               </span>
             </div>
-            <p className="text-xs text-slate-500 mb-6">Historical revenue peak visualizer month-by-month</p>
+            <p className="text-sm font-medium text-slate-500">Historical revenue peak visualizer</p>
           </div>
 
           <div className="h-64 w-full">
@@ -382,21 +382,21 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                 <AreaChart data={monthlyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0f172a" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0.05}/>
+                      <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0}/>
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderRadius: '0px', color: '#fff', border: 'none', fontSize: '12px' }}
+                    contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
                     formatter={(value: any) => [`₹${value}`, 'Revenue']}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#0f172a" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                  <Area type="monotone" dataKey="revenue" stroke="#0ea5e9" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-400 text-xs font-bold">
+              <div className="h-full flex items-center justify-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
                 No monthly trend data recorded yet.
               </div>
             )}
@@ -404,40 +404,40 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
         </div>
 
         {/* Most Repeatedly Rented Dresses Bar Chart (5 Cols) */}
-        <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm lg:col-span-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                <Shirt className="w-5 h-5 text-blue-800" />
-                Repeatedly Rented Outfits
+        <div className="neo-flat p-8 lg:col-span-5 flex flex-col justify-between">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xl font-black text-[var(--color-navy)] tracking-wide flex items-center gap-3">
+                <Shirt className="w-6 h-6 text-[var(--color-sky)]" />
+                Top Costumes
               </h3>
-              <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-100 font-bold px-2.5 py-1 rounded-none uppercase">
-                Hire Count
+              <span className="text-[10px] neo-pressed text-[var(--color-sky)] font-bold px-3 py-1.5 uppercase tracking-widest">
+                Demand
               </span>
             </div>
-            <p className="text-xs text-slate-500 mb-6">Costumes ordered most frequently by customers</p>
+            <p className="text-sm font-medium text-slate-500">Outfits ordered most frequently</p>
           </div>
 
           <div className="h-64 w-full">
             {outfitChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={outfitChartData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
-                  <XAxis type="number" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                  <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#334155', fontWeight: 600 }} width={90} axisLine={false} tickLine={false} />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#102A43', fontWeight: 800 }} width={100} axisLine={false} tickLine={false} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderRadius: '0px', color: '#fff', border: 'none', fontSize: '12px' }}
-                    formatter={(val: any, name: any, item: any) => [`${val} times rented (₹${item.payload.revenue})`, 'Usage']}
+                    contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
+                    formatter={(val: any, name: any, item: any) => [`${val} times (₹${item.payload.revenue})`, 'Usage']}
                   />
-                  <Bar dataKey="rentals" radius={[0, 0, 0, 0]}>
+                  <Bar dataKey="rentals" radius={[4, 4, 4, 4]} barSize={16}>
                     {outfitChartData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={DARK_BLUE_PALETTE[index % DARK_BLUE_PALETTE.length]} />
+                      <Cell key={`cell-${index}`} fill={['#102A43', '#0ea5e9', '#627D98', '#9FB3C8'][index % 4]} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-400 text-xs font-bold">
-                No costume hire statistics calculated yet.
+              <div className="h-full flex items-center justify-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                No costume hire statistics yet.
               </div>
             )}
           </div>
@@ -446,38 +446,38 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
       </div>
 
       {/* --- SECTION 4: STATEMENT GENERATOR FOR CUSTOM PERIODS & BILLS --- */}
-      <div className="bg-white border border-slate-200 rounded-none p-6 md:p-8 shadow-sm space-y-6">
+      <div className="neo-flat p-8 space-y-8">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[rgba(0,0,0,0.05)] pb-6">
           <div>
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-900" />
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                Period Financial Statement & Bill Generator
+            <div className="flex items-center gap-3">
+              <FileText className="w-6 h-6 text-[var(--color-navy)]" />
+              <h3 className="text-xl font-black text-[var(--color-navy)] tracking-tight">
+                Statement & Bill Generator
               </h3>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Filter by any custom date period or pre-set timeframe to generate and download itemized revenue statements.
+            <p className="text-sm font-medium text-slate-500 mt-2">
+              Filter by date period to download itemized revenue statements.
             </p>
           </div>
 
           {/* Quick Filter Buttons */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-4">
             {[
               { id: 'all', label: 'All Time' },
               { id: 'this_month', label: 'This Month' },
               { id: 'last_30', label: 'Last 30 Days' },
               { id: 'last_90', label: 'Last 90 Days' },
-              { id: 'custom', label: 'Custom Range' },
+              { id: 'custom', label: 'Custom' },
             ].map(tab => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setDateRangeFilter(tab.id as any)}
-                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
                   dateRangeFilter === tab.id
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'neo-pressed text-[var(--color-sky)]'
+                    : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
                 }`}
               >
                 {tab.label}
@@ -488,57 +488,57 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
         {/* Custom Date Selector Inputs (if custom chosen) */}
         {dateRangeFilter === 'custom' && (
-          <div className="bg-slate-50 p-4 rounded-none border border-slate-200 flex flex-col sm:flex-row items-center gap-4 animate-fadeIn">
-            <div className="flex-1 w-full space-y-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Start Date</label>
+          <div className="neo-pressed p-6 flex flex-col sm:flex-row items-center gap-6 animate-fadeIn">
+            <div className="flex-1 w-full space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Start Date</label>
               <input
                 type="date"
                 value={customStartDate}
                 onChange={(e) => setCustomStartDate(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-none px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full neo-pressed px-4 py-3 text-sm font-bold text-[var(--color-navy)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] bg-transparent"
               />
             </div>
-            <div className="flex-1 w-full space-y-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">End Date</label>
+            <div className="flex-1 w-full space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">End Date</label>
               <input
                 type="date"
                 value={customEndDate}
                 onChange={(e) => setCustomEndDate(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-none px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full neo-pressed px-4 py-3 text-sm font-bold text-[var(--color-navy)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] bg-transparent"
               />
             </div>
           </div>
         )}
 
         {/* Summary Metric Strip for Selected Period */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-none border border-slate-200/80">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 neo-pressed p-6">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Period Revenue</p>
-            <p className="text-2xl font-black text-slate-900 font-mono mt-1">₹{periodTotalRevenue}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Period Revenue</p>
+            <p className="text-2xl font-black text-[var(--color-navy)] font-mono mt-2">₹{periodTotalRevenue}</p>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Realized Cash</p>
-            <p className="text-2xl font-black text-emerald-600 font-mono mt-1">₹{periodRealizedRevenue}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Realized Cash</p>
+            <p className="text-2xl font-black text-emerald-500 font-mono mt-2">₹{periodRealizedRevenue}</p>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Deposits Handled</p>
-            <p className="text-2xl font-black text-blue-700 font-mono mt-1">₹{periodDepositsHandled}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Deposits Handled</p>
+            <p className="text-2xl font-black text-[var(--color-sky)] font-mono mt-2">₹{periodDepositsHandled}</p>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Total Bookings</p>
-            <p className="text-2xl font-black text-slate-900 font-mono mt-1">{periodRentals.length}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Bookings</p>
+            <p className="text-2xl font-black text-[var(--color-navy)] font-mono mt-2">{periodRentals.length}</p>
           </div>
         </div>
 
         {/* Action Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-4">
           <button
             type="button"
             onClick={handleDownloadPDFReport}
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-3.5 rounded-none shadow-md transition-all cursor-pointer"
+            className="flex items-center gap-3 neo-btn-primary font-bold text-xs px-8 py-4 uppercase tracking-widest cursor-pointer"
           >
-            <Download className="w-4 h-4 text-sky-400" />
-            Download PDF Financial Statement ({periodRentals.length} Bookings)
+            <Download className="w-5 h-5" />
+            Download PDF Statement ({periodRentals.length})
           </button>
         </div>
 

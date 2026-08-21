@@ -241,35 +241,35 @@ export default function RentalsList({
     <div className="space-y-6">
       
       {/* 1. Header Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-white p-4 border border-slate-200 rounded-none shadow-sm">
+      <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch md:items-center neo-flat p-6">
         
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-sky)]" />
           <input
             type="text"
             id="search-rentals"
-            placeholder="Search by Booking # (e.g. BK-1001), name, phone, or address..."
+            placeholder="Search bookings, names, phones..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-none bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-medium"
+            className="w-full pl-12 pr-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] transition-all"
           />
         </div>
 
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
           {(['all', 'pre-booked', 'active', 'overdue', 'returned'] as const).map((filter) => (
             <button
               key={filter}
               type="button"
               id={`filter-status-${filter}`}
               onClick={() => setStatusFilter(filter)}
-              className={`px-3.5 py-1.5 rounded-none font-bold text-xs uppercase shrink-0 transition-all cursor-pointer ${
+              className={`px-5 py-2.5 font-bold text-[10px] uppercase tracking-widest shrink-0 transition-all cursor-pointer ${
                 statusFilter === filter
                   ? filter === 'pre-booked'
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                    : 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                    ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
+                    : 'neo-pressed text-[var(--color-sky)]'
+                  : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
               }`}
             >
               {filter === 'pre-booked' ? 'PRE-BOOKED' : filter}
@@ -278,15 +278,15 @@ export default function RentalsList({
         </div>
 
         {/* Excel Export Triggers */}
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <button
             type="button"
             id="btn-export-filtered-rentals"
             onClick={() => handleExportRentalsExcel(false)}
-            className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 rounded-none flex items-center justify-center gap-1.5 transition-all text-xs font-bold cursor-pointer"
-            title="Export current filtered list"
+            className="px-5 py-2.5 neo-btn text-emerald-500 hover:text-emerald-600 flex items-center justify-center gap-2 transition-all text-[10px] tracking-widest uppercase font-bold cursor-pointer"
+            title="Export filtered list"
           >
-            <FileDown className="w-4.5 h-4.5" /> Export Filtered (.xlsx)
+            <FileDown className="w-4 h-4" /> Export (.xlsx)
           </button>
         </div>
       </div>
@@ -295,77 +295,76 @@ export default function RentalsList({
       {returningRentalId && (() => {
         const rental = rentals.find((r) => r.id === returningRentalId)!;
         return (
-          <div className="p-6 bg-white border border-slate-200 rounded-none shadow-sm space-y-4 animate-fadeIn">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-blue-800" />
-                Register Costume Return for {rental.customerName}
+          <div className="p-8 neo-flat space-y-6 animate-fadeIn">
+            <div className="flex justify-between items-center border-b border-[rgba(0,0,0,0.05)] pb-4">
+              <h3 className="text-2xl font-black text-[var(--color-navy)] flex items-center gap-3">
+                <Receipt className="w-6 h-6 text-[var(--color-sky)]" />
+                Return: {rental.customerName}
               </h3>
               <button
                 type="button"
-                id="btn-close-return-panel"
                 onClick={() => setReturningRentalId(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-none transition-colors"
+                className="p-2 neo-btn text-slate-400 hover:text-slate-600 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="bg-slate-50 border border-slate-200 rounded-none p-4 space-y-2">
-                  <h4 className="font-bold text-slate-800 text-sm">Handover Costume Specifications</h4>
-                  <div className="text-xs text-slate-600 space-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="neo-pressed p-6 space-y-4">
+                  <h4 className="font-bold text-[var(--color-sky)] text-[10px] uppercase tracking-widest">Handover Specifications</h4>
+                  <div className="text-sm font-medium text-[var(--color-navy)] space-y-2">
                     {rental.items.map((i) => (
                       <p key={i.itemId}>
                         • <strong>{i.name}</strong> (Size: {i.size} • Rented: {i.quantity})
                       </p>
                     ))}
                     {rental.additionalItems.length > 0 && (
-                      <div className="pt-1.5 border-t border-slate-200 mt-1.5">
-                        <p className="font-semibold">Additional items to count back:</p>
+                      <div className="pt-3 border-t border-[rgba(0,0,0,0.05)] mt-3">
+                        <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Extras to return:</p>
                         {rental.additionalItems.map((ai, index) => (
-                          <p key={index} className="text-xxs">• {ai.name} (Qty: {ai.quantity})</p>
+                          <p key={index} className="text-xs font-bold">• {ai.name} (Qty: {ai.quantity})</p>
                         ))}
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Date Returned *</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Return Date *</label>
                     <input
                       type="date"
                       required
                       value={actualReturnDate}
                       onChange={(e) => setActualReturnDate(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Notes on Return Condition</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Condition Notes</label>
                     <input
                       type="text"
-                      placeholder="e.g. Returned clean, minor rip..."
+                      placeholder="e.g. Clean, minor rip"
                       value={returnNotes}
                       onChange={(e) => setReturnNotes(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                      className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
                     />
                   </div>
                 </div>
 
                 {/* Compare Handover Photos */}
                 {rental.handoverPhotos.length > 0 && (
-                  <div className="space-y-1.5">
-                    <p className="text-xs font-bold text-slate-600 flex items-center gap-1">
-                      <Eye className="w-3.5 h-3.5 text-slate-400" /> Reference Handover Condition Photos:
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-[var(--color-sky)]" /> Handover Reference Photos
                     </p>
-                    <div className="flex gap-2 overflow-x-auto pb-1">
+                    <div className="flex gap-4 overflow-x-auto pb-2">
                       {rental.handoverPhotos.map((p, idx) => (
-                        <div key={idx} className="relative w-16 h-16 rounded-none overflow-hidden border border-slate-200 shrink-0">
-                          <img referrerPolicy="no-referrer" src={p} alt="handover record" className="w-full h-full object-cover" />
+                        <div key={idx} className="relative w-20 h-20 neo-pressed overflow-hidden shrink-0">
+                          <img referrerPolicy="no-referrer" src={p} alt="handover record" className="w-full h-full object-cover rounded-lg mix-blend-multiply" />
                         </div>
                       ))}
                     </div>
@@ -374,32 +373,35 @@ export default function RentalsList({
               </div>
 
               {/* Capture return photos */}
-              <div className="bg-slate-50 p-4 border border-slate-200 rounded-none">
+              <div className="neo-flat p-6">
+                <div className="mb-4">
+                  <span className="text-[10px] font-bold text-[var(--color-sky)] uppercase tracking-widest font-mono">
+                    Capture Return Condition
+                  </span>
+                </div>
                 <CameraCapture
                   photos={returnPhotos}
                   onChange={setReturnPhotos}
-                  label="Capture Return Condition"
+                  label="Take Photos"
                   maxPhotos={5}
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <div className="flex justify-end gap-4 pt-6 border-t border-[rgba(0,0,0,0.05)]">
               <button
                 type="button"
-                id="btn-cancel-complete-return"
                 onClick={() => setReturningRentalId(null)}
-                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-none text-xs transition-colors cursor-pointer"
+                className="px-6 py-3 neo-btn text-slate-500 font-bold text-sm transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                id="btn-complete-return"
                 onClick={handleCompleteReturn}
-                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-none text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-6 py-3 neo-btn-primary flex items-center gap-2 transition-colors cursor-pointer"
               >
-                <Check className="w-4 h-4" /> Mark Dress Returned
+                <Check className="w-5 h-5" /> Mark Returned
               </button>
             </div>
           </div>
@@ -408,143 +410,140 @@ export default function RentalsList({
 
       {/* 3. Editing Rental Record Panel */}
       {editingRental && (
-        <form onSubmit={saveRentalEdits} className="p-6 bg-white border border-slate-200 rounded-none shadow-sm space-y-4 animate-fadeIn">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-            <h3 className="text-lg font-bold text-slate-800">Edit Rental Handover Record</h3>
+        <form onSubmit={saveRentalEdits} className="p-8 neo-flat space-y-6 animate-fadeIn">
+          <div className="flex justify-between items-center border-b border-[rgba(0,0,0,0.05)] pb-4">
+            <h3 className="text-2xl font-black text-[var(--color-navy)]">Edit Ticket</h3>
             <button
               type="button"
-              id="btn-close-edit-rental"
               onClick={() => setEditingRental(null)}
-              className="p-1 text-slate-400 hover:text-slate-600 rounded-none transition-colors"
+              className="p-2 neo-btn text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Customer Name</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Customer Name</label>
               <input
                 type="text"
                 required
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Customer Phone</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Customer Phone</label>
               <input
                 type="text"
                 required
                 value={editPhone}
                 onChange={(e) => setEditPhone(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Customer Address</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Address</label>
               <input
                 type="text"
                 value={editAddress}
-                placeholder="Enter Address / City"
+                placeholder="City / Area"
                 onChange={(e) => setEditAddress(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Rental Charge (₹)</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Rent (₹)</label>
               <input
                 type="number"
                 required
                 min="0"
                 value={editCharge}
                 onChange={(e) => setEditCharge(parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Date Given</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Pickup Date</label>
               <input
                 type="date"
                 required
                 value={editDateGiven}
                 onChange={(e) => setEditDateGiven(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Expected Return Date</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Expected Return</label>
               <input
                 type="date"
                 required
                 value={editExpectedDate}
                 onChange={(e) => setEditExpectedDate(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Advance Deposit (₹)</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Deposit (₹)</label>
               <input
                 type="number"
                 required
                 min="0"
                 value={editAdvance}
                 onChange={(e) => setEditAdvance(parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-1.5 border border-slate-200 rounded-none text-sm bg-slate-50 font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-amber-800 mb-1">Pre-Booking Token Paid Today (₹)</label>
+              <label className="block text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-2">Pre-Book Token (₹)</label>
               <input
                 type="number"
                 min="0"
                 value={editPreBookingPaid}
                 onChange={(e) => setEditPreBookingPaid(parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-1.5 border border-amber-200 rounded-none text-sm bg-amber-50/50 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600"
+                className="w-full px-4 py-3 neo-pressed ring-1 ring-amber-400 text-sm font-bold font-mono text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
             </div>
 
             <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-xs font-bold text-slate-700 mb-1">Notes</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Notes</label>
               <textarea
                 value={editNotes}
                 onChange={(e) => setEditNotes(e.target.value)}
                 rows={2}
-                className="w-full px-3 py-2 border border-slate-200 rounded-none text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 neo-pressed text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+          <div className="flex justify-end gap-4 pt-6 border-t border-[rgba(0,0,0,0.05)]">
             <button
               type="button"
-              id="btn-cancel-save-edit-rental"
               onClick={() => setEditingRental(null)}
-              className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-none text-xs transition-colors cursor-pointer"
+              className="px-6 py-3 neo-btn text-slate-500 font-bold text-sm transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              id="btn-save-edit-rental"
-              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-none text-xs shadow-xs transition-colors cursor-pointer"
+              className="px-6 py-3 neo-btn-primary font-bold text-sm transition-colors cursor-pointer"
             >
-              Save Record Changes
+              Save Changes
             </button>
           </div>
         </form>
       )}
 
       {/* 4. Tickets Stack/List view */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {filteredRentals.map((rental) => {
           const computedStatus = getRentalComputedStatus(rental);
           const isPreBooked = computedStatus === 'pre-booked';
@@ -558,80 +557,77 @@ export default function RentalsList({
           return (
             <div
               key={rental.id}
-              id={`rental-card-${rental.id}`}
-              className={`relative bg-white border rounded-none shadow-xs hover:shadow-sm transition-all flex flex-col md:flex-row justify-between overflow-hidden ${
+              className={`neo-flat relative overflow-hidden transition-all flex flex-col md:flex-row justify-between group ${
                 isPreBooked
-                  ? 'border-amber-300 bg-amber-50/10'
+                  ? 'ring-1 ring-amber-400'
                   : isOverdue
-                  ? 'border-red-200 bg-red-50/5'
-                  : isReturned
-                  ? 'border-slate-200'
-                  : 'border-blue-100'
+                  ? 'ring-1 ring-red-400'
+                  : ''
               }`}
             >
               {/* Costume Tag left accent bar */}
               <div
-                className={`w-full md:w-2 shrink-0 h-3 md:h-auto ${
-                  isPreBooked ? 'bg-amber-500' : isOverdue ? 'bg-red-500' : isReturned ? 'bg-slate-300' : 'bg-blue-600'
+                className={`absolute left-0 top-0 w-2 h-full ${
+                  isPreBooked ? 'bg-amber-400' : isOverdue ? 'bg-red-400' : isReturned ? 'bg-slate-300' : 'bg-[var(--color-sky)]'
                 }`}
               />
 
-              <div className="flex-1 p-5 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+              <div className="flex-1 p-6 pl-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 {/* Section A: Customer details (4 cols) */}
-                <div className="md:col-span-4 space-y-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
+                <div className="md:col-span-4 space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <span
-                      className={`text-xxs font-black tracking-wider uppercase px-2 py-0.5 rounded-none font-mono ${
+                      className={`text-[10px] font-bold tracking-widest uppercase px-3 py-1 neo-pressed ${
                         isPreBooked
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          ? 'text-amber-500'
                           : isOverdue
-                          ? 'bg-red-100 text-red-700'
+                          ? 'text-red-500'
                           : isReturned
-                          ? 'bg-slate-100 text-slate-600'
-                          : 'bg-blue-50 text-blue-800'
+                          ? 'text-slate-400'
+                          : 'text-[var(--color-sky)]'
                       }`}
                     >
                       {isPreBooked ? 'PRE-BOOKED' : computedStatus}
                     </span>
                     
-                    <span className="text-xs font-mono font-bold text-amber-900 bg-amber-50 px-2 py-0.5 border border-amber-200/80">
-                      BOOKING #: {rental.bookingNumber || 'BK-1000'}
+                    <span className="text-[10px] font-mono font-bold text-[var(--color-navy)] uppercase tracking-widest">
+                      #{rental.bookingNumber || '1000'}
                     </span>
                   </div>
 
-                  <h4 className="text-lg font-bold text-slate-900 flex items-center gap-1.5 leading-tight">
-                    <User className="w-4 h-4 text-slate-400 shrink-0" />
+                  <h4 className="text-xl font-black text-[var(--color-navy)] flex items-center gap-2 leading-tight">
+                    <User className="w-5 h-5 text-[var(--color-sky)] shrink-0" />
                     {rental.customerName}
                   </h4>
 
-                  <p className="text-sm text-slate-500 flex items-center gap-1.5 font-mono">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <p className="text-sm font-medium text-slate-500 flex items-center gap-2 font-mono">
+                    <Phone className="w-4 h-4 text-slate-400 shrink-0" />
                     {rental.customerPhone}
                   </p>
 
                   {rental.customerAddress && (
-                    <p className="text-xs text-slate-500 flex items-center gap-1.5 font-mono truncate" title={rental.customerAddress}>
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <p className="text-xs font-medium text-slate-500 flex items-center gap-2 font-mono truncate" title={rental.customerAddress}>
+                      <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
                       {rental.customerAddress}
                     </p>
                   )}
                 </div>
 
                 {/* Section B: Rented Outfit Details (4 cols) */}
-                <div className="md:col-span-4 space-y-1.5 border-y md:border-y-0 md:border-x border-slate-100 py-3 md:py-0 md:px-5">
-                  <span className="text-xxs font-bold text-slate-400 uppercase tracking-wider font-mono">Costumes & Items</span>
-                  <div className="space-y-1 text-sm">
+                <div className="md:col-span-4 space-y-3 md:border-x border-[rgba(0,0,0,0.05)] md:px-8 py-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Items</span>
+                  <div className="space-y-2 text-sm">
                     {rental.items.map((item, idx) => (
-                      <p key={idx} className="font-semibold text-slate-800 flex justify-between">
+                      <p key={idx} className="font-bold text-[var(--color-navy)] flex justify-between items-center">
                         <span>• {item.name}</span>
-                        <span className="text-xxs bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded-none ml-2 whitespace-nowrap">
+                        <span className="text-[10px] neo-pressed text-[var(--color-sky)] px-2 py-1 font-mono uppercase tracking-widest">
                           {item.size} × {item.quantity}
                         </span>
                       </p>
                     ))}
 
                     {rental.additionalItems.length > 0 && (
-                      <div className="text-slate-500 text-xs italic pt-1 border-t border-dashed border-slate-100 mt-1">
+                      <div className="text-slate-500 text-xs font-medium pt-2 border-t border-[rgba(0,0,0,0.05)] mt-2">
                         Extras: {rental.additionalItems.map((ai) => `${ai.name} (x${ai.quantity})`).join(', ')}
                       </div>
                     )}
@@ -639,49 +635,49 @@ export default function RentalsList({
                 </div>
 
                 {/* Section C: Financials & Dates (4 cols) */}
-                <div className="md:col-span-4 grid grid-cols-2 gap-2.5 text-xs">
-                  <div className="space-y-0.5">
-                    <span className="block text-xxs font-mono uppercase text-slate-400">
-                      {isPreBooked ? 'Scheduled Pickup' : 'Handed Over'}
+                <div className="md:col-span-4 grid grid-cols-2 gap-4 text-sm font-medium">
+                  <div className="space-y-1">
+                    <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">
+                      {isPreBooked ? 'Pickup' : 'Handover'}
                     </span>
-                    <span className="text-sm text-slate-700 font-semibold flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[var(--color-navy)] font-bold flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[var(--color-sky)]" />
                       {rental.dateGiven}
                     </span>
                   </div>
 
-                  <div className="space-y-0.5">
-                    <span className="block text-xxs font-mono uppercase text-slate-400">Due Back</span>
-                    <span className={`text-sm font-semibold flex items-center gap-1 ${isOverdue ? 'text-red-600 font-bold' : 'text-slate-700'}`}>
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="space-y-1">
+                    <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">Due</span>
+                    <span className={`font-bold flex items-center gap-2 ${isOverdue ? 'text-red-500' : 'text-[var(--color-navy)]'}`}>
+                      <Calendar className={`w-4 h-4 ${isOverdue ? 'text-red-400' : 'text-[var(--color-sky)]'}`} />
                       {rental.expectedReturnDate}
                     </span>
                   </div>
 
-                  <div className="space-y-0.5">
-                    <span className="block text-xxs font-mono uppercase text-slate-400">Rental Charge</span>
-                    <span className="text-sm font-bold text-blue-700 font-mono">
+                  <div className="space-y-1">
+                    <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">Rent</span>
+                    <span className="font-black text-[var(--color-sky)] font-mono">
                       ₹{rental.rentalCharge}
                     </span>
                   </div>
 
-                  <div className="space-y-0.5">
-                    <span className="block text-xxs font-mono uppercase text-slate-400">Deposit (Refundable)</span>
-                    <span className={`text-sm font-bold font-mono ${rental.advanceReturned ? 'text-slate-400 line-through' : 'text-emerald-600'}`}>
+                  <div className="space-y-1">
+                    <span className="block text-[10px] font-bold tracking-widest uppercase text-slate-500">Deposit</span>
+                    <span className={`font-black font-mono ${rental.advanceReturned ? 'text-slate-400 line-through' : 'text-emerald-500'}`}>
                       ₹{rental.advanceAmount}
                     </span>
                   </div>
 
                   {/* Pre-Booking Token & Remaining Balance if Pre-Booked */}
                   {isPreBooked && (
-                    <div className="col-span-2 pt-2 border-t border-amber-200/60 bg-amber-50/80 p-2 rounded-none space-y-1">
-                      <div className="flex justify-between text-xxs font-bold text-amber-900">
-                        <span>Pre-Paid Advance Token:</span>
-                        <span className="font-mono text-emerald-700">₹{prePaid}</span>
+                    <div className="col-span-2 pt-4 border-t border-[rgba(0,0,0,0.05)] mt-2 space-y-2">
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-amber-500">
+                        <span>Paid Token:</span>
+                        <span className="font-mono text-emerald-500">₹{prePaid}</span>
                       </div>
-                      <div className="flex justify-between text-xs font-black text-slate-900 border-t border-amber-200/80 pt-1">
-                        <span>Balance Due at Handover:</span>
-                        <span className="font-mono text-amber-900">₹{remainingBalance}</span>
+                      <div className="flex justify-between text-sm font-black text-[var(--color-navy)] border-t border-[rgba(0,0,0,0.05)] pt-2">
+                        <span className="uppercase tracking-widest text-[10px]">Due at Handover:</span>
+                        <span className="font-mono text-amber-500 text-lg leading-none">₹{remainingBalance}</span>
                       </div>
                     </div>
                   )}
@@ -689,54 +685,50 @@ export default function RentalsList({
               </div>
 
               {/* Action Buttons Toolbar at Right side */}
-              <div className="bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100 p-4 shrink-0 flex md:flex-col justify-end md:justify-center gap-2 items-center">
+              <div className="md:w-32 bg-[rgba(0,0,0,0.02)] p-4 shrink-0 flex flex-row md:flex-col justify-center gap-4 items-center border-t md:border-t-0 md:border-l border-[rgba(0,0,0,0.05)]">
                 
-                <div className="flex gap-1 md:flex-row items-center">
+                <div className="flex gap-2 flex-row md:flex-col w-full">
                   {/* Download PDF Invoice */}
                   <button
                     type="button"
-                    id={`btn-download-pdf-${rental.id}`}
                     onClick={() => {
                       generateRentalInvoicePDF(rental);
                       alert(`Generated PDF Invoice for ${rental.customerName}`, 'success');
                     }}
-                    className="p-1.5 rounded-none text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
-                    title="Download PDF Bill Invoice"
+                    className="p-3 w-full neo-btn text-[var(--color-sky)] hover:text-[var(--color-navy)] flex justify-center"
+                    title="Download PDF"
                   >
-                    <Download className="w-4.5 h-4.5" />
+                    <Download className="w-5 h-5" />
                   </button>
 
                   {/* View details */}
                   <button
                     type="button"
-                    id={`btn-view-details-${rental.id}`}
                     onClick={() => setSelectedRentalForView(rental)}
-                    className="p-1.5 rounded-none text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 transition-colors cursor-pointer"
-                    title="View Invoice Slip"
+                    className="p-3 w-full neo-btn text-slate-400 hover:text-[var(--color-navy)] flex justify-center"
+                    title="View Invoice"
                   >
-                    <Eye className="w-4.5 h-4.5" />
+                    <Eye className="w-5 h-5" />
                   </button>
 
                   {/* Edit */}
                   <button
                     type="button"
-                    id={`btn-edit-rental-${rental.id}`}
                     onClick={() => startEditRental(rental)}
-                    className="p-1.5 rounded-none text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 transition-colors cursor-pointer"
+                    className="p-3 w-full neo-btn text-slate-400 hover:text-[var(--color-navy)] flex justify-center"
                     title="Edit Record"
                   >
-                    <Edit2 className="w-4.5 h-4.5" />
+                    <Edit2 className="w-5 h-5" />
                   </button>
 
                   {/* Delete */}
                   <button
                     type="button"
-                    id={`btn-delete-rental-${rental.id}`}
                     onClick={() => handleDeleteRental(rental.id, rental.customerName)}
-                    className="p-1.5 rounded-none text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                    className="p-3 w-full neo-btn text-red-400 hover:text-red-500 flex justify-center"
                     title="Delete Record"
                   >
-                    <Trash2 className="w-4.5 h-4.5" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
 
@@ -744,45 +736,42 @@ export default function RentalsList({
                 {isPreBooked ? (
                   <button
                     type="button"
-                    id={`btn-handover-prebooking-${rental.id}`}
                     onClick={() => handleHandoverPreBooking(rental)}
-                    className="px-3 py-1.5 rounded-none bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs flex items-center gap-1 cursor-pointer shadow-sm transition-all"
-                    title="Collect remaining balance and mark as active handover"
+                    className="w-full py-3 neo-btn text-amber-500 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight hover:text-amber-600"
+                    title="Complete Handover"
                   >
-                    <ArrowRight className="w-4 h-4" /> Handover (Collect ₹{remainingBalance})
+                    <ArrowRight className="w-5 h-5 mb-1" /> Handover
                   </button>
                 ) : !isReturned ? (
                   <button
                     type="button"
-                    id={`btn-return-dress-${rental.id}`}
                     onClick={() => openReturnPanel(rental)}
-                    className="px-3 py-1.5 rounded-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer shadow-sm transition-all"
-                    title="Process Costume Hand-back"
+                    className="w-full py-3 neo-btn text-emerald-500 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight hover:text-emerald-600"
+                    title="Process Return"
                   >
-                    <CheckCircle2 className="w-4 h-4" /> Return
+                    <CheckCircle2 className="w-5 h-5 mb-1" /> Return
                   </button>
                 ) : (
-                  <div className="px-3 py-1 text-emerald-700 font-bold text-xs bg-emerald-50 rounded-none border border-emerald-100 flex items-center gap-1 select-none">
-                    <Check className="w-3.5 h-3.5" /> Returned
+                  <div className="w-full py-3 neo-pressed text-emerald-500 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight">
+                    <Check className="w-5 h-5 mb-1" /> Returned
                   </div>
                 )}
 
                 {/* Advance Refund Toggle */}
                 <button
                   type="button"
-                  id={`btn-toggle-advance-${rental.id}`}
                   onClick={() => handleToggleAdvance(rental)}
                   disabled={!isReturned}
-                  className={`px-2.5 py-1.5 rounded-none border font-bold text-xs flex items-center gap-1 cursor-pointer transition-all ${
+                  className={`w-full py-3 font-bold text-[10px] uppercase tracking-widest flex flex-col items-center gap-1 leading-tight transition-all ${
                     !isReturned 
-                      ? 'opacity-40 border-slate-100 bg-slate-50 text-slate-400' 
+                      ? 'neo-pressed text-slate-400 opacity-50' 
                       : rental.advanceReturned 
-                      ? 'bg-slate-200 border-slate-300 text-slate-600' 
-                      : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                      ? 'neo-pressed text-slate-400' 
+                      : 'neo-btn text-emerald-500 hover:text-emerald-600'
                   }`}
-                  title={rental.advanceReturned ? 'Deposit is Refunded' : 'Pending Deposit Refund'}
+                  title={rental.advanceReturned ? 'Refunded' : 'Refund'}
                 >
-                  {rental.advanceReturned ? 'Refunded' : 'Refund Deposit'}
+                  {rental.advanceReturned ? 'Refunded' : 'Refund'}
                 </button>
               </div>
             </div>
@@ -803,37 +792,35 @@ export default function RentalsList({
         const r = selectedRentalForView;
         const computed = getRentalComputedStatus(r);
         return (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto animate-fadeIn font-sans">
-            <div className="bg-white border border-slate-200 rounded-none max-w-2xl w-full shadow-xl relative overflow-hidden my-8">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fadeIn font-sans">
+            <div className="neo-flat max-w-2xl w-full relative overflow-hidden my-8">
               
               {/* Ticket Header */}
-              <div className="bg-slate-900 text-slate-100 p-6 flex justify-between items-center border-b border-slate-800 relative">
+              <div className="bg-[var(--color-navy)] text-slate-100 p-8 flex justify-between items-center relative">
                 <div>
-                  <span className="font-mono text-xxs uppercase tracking-wider text-sky-400 font-bold block">ARIYA THANGAM FANCY DRESS FOR RENT</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <h3 className="text-xl font-bold text-white">Rental Ticket</h3>
-                    <span className="bg-amber-500 text-slate-950 font-black text-xs px-2 py-0.5 font-mono">
-                      BOOKING #: {r.bookingNumber || 'BK-1000'}
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-sky)] font-bold block mb-2">ARIYA THANGAM FANCY DRESS FOR RENT</span>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-2xl font-black text-white">Invoice</h3>
+                    <span className="neo-flat text-[var(--color-navy)] font-black text-[10px] px-3 py-1 font-mono uppercase tracking-widest">
+                      #{r.bookingNumber || '1000'}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    id="btn-modal-download-pdf"
                     onClick={() => {
                       generateRentalInvoicePDF(r);
                       alert(`Downloaded PDF Invoice for ${r.customerName}`, 'success');
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-none transition-all cursor-pointer shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 neo-pressed text-slate-200 font-bold text-xs uppercase tracking-widest hover:text-white transition-all cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5" /> PDF Invoice
+                    <Download className="w-4 h-4" /> PDF
                   </button>
                   <button
                     type="button"
-                    id="btn-close-view-modal"
                     onClick={() => setSelectedRentalForView(null)}
-                    className="p-1.5 bg-slate-800 text-slate-400 rounded-none hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+                    className="p-2 bg-[rgba(0,0,0,0.2)] text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -841,52 +828,52 @@ export default function RentalsList({
               </div>
 
               {/* Receipt Content */}
-              <div className="p-6 space-y-5">
+              <div className="p-8 space-y-8">
                 
                 {/* Visual divider line */}
-                <div className="border-b border-slate-100 pb-4 flex justify-between items-center text-sm">
+                <div className="border-b border-[rgba(0,0,0,0.05)] pb-6 flex justify-between items-start text-sm">
                   <div>
-                    <p className="text-xxs text-slate-400 uppercase font-mono tracking-wider font-bold">Issued To</p>
-                    <p className="text-lg font-bold text-slate-800">{r.customerName}</p>
-                    <p className="text-xs text-slate-500 font-mono font-semibold">{r.customerPhone}</p>
+                    <p className="text-[10px] text-slate-500 uppercase font-mono tracking-widest font-bold mb-2">Issued To</p>
+                    <p className="text-xl font-black text-[var(--color-navy)]">{r.customerName}</p>
+                    <p className="text-sm text-slate-500 font-mono font-bold mt-1">{r.customerPhone}</p>
                     {r.customerAddress && (
-                      <p className="text-xs text-slate-500 font-mono flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" /> {r.customerAddress}
+                      <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-2">
+                        <MapPin className="w-4 h-4 text-slate-400 shrink-0" /> {r.customerAddress}
                       </p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-xxs text-slate-400 uppercase font-mono tracking-wider font-bold">Status</p>
-                    <span className={`text-xxs font-black px-2.5 py-1 rounded-none font-mono uppercase inline-block ${
-                      computed === 'pre-booked' ? 'bg-amber-100 text-amber-900 border border-amber-300' : computed === 'overdue' ? 'bg-red-100 text-red-700' : computed === 'returned' ? 'bg-slate-100 text-slate-600' : 'bg-blue-50 text-blue-800'
+                    <p className="text-[10px] text-slate-500 uppercase font-mono tracking-widest font-bold mb-2">Status</p>
+                    <span className={`text-[10px] font-black px-4 py-2 neo-pressed font-mono uppercase tracking-widest inline-block ${
+                      computed === 'pre-booked' ? 'text-amber-500' : computed === 'overdue' ? 'text-red-500' : computed === 'returned' ? 'text-slate-500' : 'text-[var(--color-sky)]'
                     }`}>
-                      {computed === 'pre-booked' ? 'PRE-BOOKED (ADVANCE)' : computed}
+                      {computed === 'pre-booked' ? 'PRE-BOOKED' : computed}
                     </span>
                   </div>
                 </div>
 
                 {/* Items and prices list */}
-                <div className="space-y-2">
-                  <h5 className="text-xxs font-bold text-slate-400 uppercase tracking-wider font-mono">Outfits Checklist</h5>
-                  <div className="bg-slate-50 border border-slate-200 rounded-none divide-y divide-slate-100 overflow-hidden shadow-xs">
+                <div className="space-y-4">
+                  <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Outfits Checklist</h5>
+                  <div className="neo-pressed overflow-hidden">
                     {r.items.map((item, idx) => (
-                      <div key={idx} className="p-3.5 flex justify-between items-center text-sm">
+                      <div key={idx} className="p-4 flex justify-between items-center text-sm border-b border-[rgba(0,0,0,0.05)] last:border-0">
                         <div>
-                          <p className="font-bold text-slate-800">{item.name}</p>
-                          <p className="text-xxs text-slate-400">Category: {item.categoryName} • Size: {item.size}</p>
+                          <p className="font-bold text-[var(--color-navy)]">{item.name}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">{item.categoryName} • Size {item.size}</p>
                         </div>
-                        <div className="text-right font-mono text-xs font-bold text-slate-700">
+                        <div className="text-right font-mono text-xs font-bold text-[var(--color-sky)]">
                           {item.quantity} × ₹{item.rentalPrice} = ₹{item.quantity * item.rentalPrice}
                         </div>
                       </div>
                     ))}
 
                     {r.additionalItems.length > 0 && (
-                      <div className="p-3.5 bg-slate-100/40 text-xs">
-                        <p className="font-bold text-slate-700 mb-1.5 uppercase font-mono text-xxs">Accessories Checklist</p>
-                        <div className="space-y-1 text-slate-600">
+                      <div className="p-4 bg-[rgba(0,0,0,0.02)] text-xs border-t border-[rgba(0,0,0,0.05)]">
+                        <p className="font-bold text-slate-500 mb-2 uppercase font-mono text-[10px] tracking-widest">Accessories</p>
+                        <div className="space-y-2 text-slate-600">
                           {r.additionalItems.map((ai, index) => (
-                            <p key={index} className="flex justify-between font-semibold">
+                            <p key={index} className="flex justify-between font-bold">
                               <span>• {ai.name}</span>
                               <span className="font-mono text-slate-500">x{ai.quantity}</span>
                             </p>
@@ -898,64 +885,60 @@ export default function RentalsList({
                 </div>
 
                 {/* Dates Box */}
-                <div className="grid grid-cols-3 gap-4 border-y border-slate-150 py-3 font-semibold text-xs">
+                <div className="grid grid-cols-3 gap-6 border-y border-[rgba(0,0,0,0.05)] py-6 font-medium text-xs">
                   <div>
-                    <span className="block text-xxs uppercase text-slate-400 font-mono">Date Taken</span>
-                    <span className="text-sm text-slate-700 font-bold">{r.dateGiven}</span>
+                    <span className="block text-[10px] uppercase tracking-widest text-slate-500 font-mono font-bold mb-2">Pickup Date</span>
+                    <span className="text-sm text-[var(--color-navy)] font-black">{r.dateGiven}</span>
                   </div>
                   <div>
-                    <span className="block text-xxs uppercase text-slate-400 font-mono">Expected Return</span>
-                    <span className={`text-sm font-bold ${computed === 'overdue' ? 'text-red-600 font-black' : 'text-slate-700'}`}>
+                    <span className="block text-[10px] uppercase tracking-widest text-slate-500 font-mono font-bold mb-2">Due Return</span>
+                    <span className={`text-sm font-black ${computed === 'overdue' ? 'text-red-500' : 'text-[var(--color-navy)]'}`}>
                       {r.expectedReturnDate}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-xxs uppercase text-slate-400 font-mono">Actual Return</span>
-                    <span className="text-sm text-slate-700 font-bold">
-                      {r.actualReturnDate || 'Not Returned Yet'}
+                    <span className="block text-[10px] uppercase tracking-widest text-slate-500 font-mono font-bold mb-2">Actual Return</span>
+                    <span className="text-sm text-slate-500 font-black">
+                      {r.actualReturnDate || 'Pending'}
                     </span>
                   </div>
                 </div>
 
                 {/* Charges Breakdown */}
-                <div className="space-y-3 bg-slate-50 p-4 rounded-none border border-slate-200">
-                  <h5 className="text-xxs font-bold text-slate-400 uppercase tracking-wider font-mono">Charges & Revenue Breakdown</h5>
-                  <div className="space-y-1.5 text-xs">
-                    <div className="flex justify-between text-slate-800 font-bold">
-                      <span>Net Costume Rental Charge (Revenue)</span>
-                      <span className="font-mono text-blue-700">₹{r.rentalCharge}</span>
+                <div className="space-y-4 neo-pressed p-6">
+                  <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Invoice Summary</h5>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between text-slate-600 font-bold">
+                      <span>Rent (Revenue)</span>
+                      <span className="font-mono text-[var(--color-navy)]">₹{r.rentalCharge}</span>
                     </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Refundable Security Advance Deposit</span>
-                      <span className="font-mono font-bold">₹{r.advanceAmount}</span>
+                    <div className="flex justify-between text-slate-600 font-bold">
+                      <span>Security Deposit</span>
+                      <span className="font-mono">₹{r.advanceAmount}</span>
                     </div>
 
                     {r.isPreBooking || r.preBookingPaid ? (
                       <>
-                        <div className="flex justify-between text-amber-900 font-bold bg-amber-50 p-1.5 border border-amber-200/60">
-                          <span>Pre-Booking Token Paid Today</span>
-                          <span className="font-mono text-emerald-700">₹{r.preBookingPaid || 0}</span>
+                        <div className="flex justify-between text-amber-600 font-bold neo-flat p-3 mt-4">
+                          <span>Token Paid</span>
+                          <span className="font-mono">₹{r.preBookingPaid || 0}</span>
                         </div>
-                        <div className="border-t border-slate-200 pt-2 flex justify-between font-black text-slate-900 text-sm">
-                          <span>Remaining Balance at Handover</span>
-                          <span className="font-mono text-amber-900 text-base">₹{(r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0)}</span>
+                        <div className="pt-4 flex justify-between font-black text-[var(--color-navy)] text-lg">
+                          <span>Balance Due</span>
+                          <span className="font-mono text-[var(--color-sky)]">₹{(r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0)}</span>
                         </div>
                       </>
                     ) : (
-                      <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-slate-800 text-sm">
-                        <span>Upfront Collected at Counter</span>
-                        <span className="font-mono text-slate-900 font-black text-base">₹{r.rentalCharge + r.advanceAmount}</span>
+                      <div className="border-t border-[rgba(0,0,0,0.05)] pt-4 flex justify-between font-black text-[var(--color-navy)] text-lg">
+                        <span>Total Paid</span>
+                        <span className="font-mono text-[var(--color-sky)]">₹{r.rentalCharge + r.advanceAmount}</span>
                       </div>
                     )}
 
-                    <p className="text-[10px] text-slate-500 italic mt-0.5">
-                      * Advance deposit (₹{r.advanceAmount}) is refunded upon costume return and is excluded from shop revenue metrics.
-                    </p>
-
-                    <div className="flex justify-between text-xxs pt-1 items-center font-bold">
-                      <span className="text-slate-500">Deposit Settlement:</span>
-                      <span className={`px-2 py-0.5 rounded-none font-mono ${r.advanceReturned ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
-                        {r.advanceReturned ? 'SETTLED & REFUNDED' : 'HELD IN SAFE (PENDING RETURN)'}
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest pt-4 items-center font-bold">
+                      <span className="text-slate-500">Deposit Status:</span>
+                      <span className={`px-3 py-1 neo-pressed ${r.advanceReturned ? 'text-emerald-500' : 'text-amber-500'}`}>
+                        {r.advanceReturned ? 'REFUNDED' : 'HELD'}
                       </span>
                     </div>
                   </div>
@@ -963,18 +946,18 @@ export default function RentalsList({
 
                 {/* Photos Grid display (Handover vs Return) */}
                 {(r.handoverPhotos.length > 0 || (r.returnPhotos && r.returnPhotos.length > 0)) && (
-                  <div className="space-y-2">
-                    <h5 className="text-xxs font-bold text-slate-400 uppercase tracking-wider font-mono">Condition Photo Archive</h5>
+                  <div className="space-y-4">
+                    <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Condition Photos</h5>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {/* Handover photos */}
                       {r.handoverPhotos.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-xxs text-slate-500 font-bold">Handover Photos ({r.handoverPhotos.length})</p>
-                          <div className="flex gap-1.5 overflow-x-auto pb-1">
+                        <div className="space-y-3">
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Handover ({r.handoverPhotos.length})</p>
+                          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
                             {r.handoverPhotos.map((img, idx) => (
-                              <div key={idx} className="w-14 h-14 rounded-none border border-slate-200 overflow-hidden shrink-0">
-                                <img referrerPolicy="no-referrer" src={img} alt="handover record" className="w-full h-full object-cover" />
+                              <div key={idx} className="w-20 h-20 neo-pressed overflow-hidden shrink-0">
+                                <img referrerPolicy="no-referrer" src={img} alt="handover record" className="w-full h-full object-cover rounded-lg mix-blend-multiply" />
                               </div>
                             ))}
                           </div>
@@ -983,12 +966,12 @@ export default function RentalsList({
 
                       {/* Return photos */}
                       {r.returnPhotos && r.returnPhotos.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-xxs text-slate-500 font-bold">Return Photos ({r.returnPhotos.length})</p>
-                          <div className="flex gap-1.5 overflow-x-auto pb-1">
+                        <div className="space-y-3">
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Return ({r.returnPhotos.length})</p>
+                          <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
                             {r.returnPhotos.map((img, idx) => (
-                              <div key={idx} className="w-14 h-14 rounded-none border border-slate-200 overflow-hidden shrink-0">
-                                <img referrerPolicy="no-referrer" src={img} alt="return record" className="w-full h-full object-cover" />
+                              <div key={idx} className="w-20 h-20 neo-pressed overflow-hidden shrink-0">
+                                <img referrerPolicy="no-referrer" src={img} alt="return record" className="w-full h-full object-cover rounded-lg mix-blend-multiply" />
                               </div>
                             ))}
                           </div>
@@ -1000,15 +983,15 @@ export default function RentalsList({
 
                 {/* Notes */}
                 {r.notes && (
-                  <div className="p-3 bg-blue-50/50 border border-blue-100 text-slate-700 rounded-none text-xs">
-                    <p className="font-bold text-xxs text-blue-800 uppercase font-mono tracking-wider mb-0.5">Receipt Notes</p>
-                    <p className="italic font-medium">&quot;{r.notes}&quot;</p>
+                  <div className="p-5 neo-pressed">
+                    <p className="font-bold text-[10px] text-slate-500 uppercase font-mono tracking-widest mb-2">Notes</p>
+                    <p className="italic font-medium text-sm text-[var(--color-navy)]">{r.notes}</p>
                   </div>
                 )}
               </div>
 
               {/* Receipt Footer printable design */}
-              <div className="bg-slate-50 text-center py-3 border-t border-slate-100 font-mono text-xxs text-slate-400 font-bold">
+              <div className="bg-[rgba(0,0,0,0.02)] text-center py-4 border-t border-[rgba(0,0,0,0.05)] font-mono text-[10px] text-slate-500 font-bold tracking-widest uppercase">
                 <span>THANK YOU FOR DEALING WITH MASQUERADE HUB</span>
               </div>
             </div>

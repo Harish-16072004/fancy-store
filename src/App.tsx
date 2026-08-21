@@ -5,7 +5,6 @@ import {
   Tag, 
   TrendingUp, 
   ClipboardList, 
-  Settings, 
   PlusCircle, 
   Database, 
   Download, 
@@ -15,22 +14,31 @@ import {
   Info,
   CheckCircle,
   HelpCircle,
-  TrendingDown,
   X,
-  BarChart3
+  BarChart3,
+  LogOut,
+  Loader2
 } from 'lucide-react';
 import { Category, InventoryItem, Rental } from './types';
-import { 
-  loadCategories, 
-  saveCategories, 
-  loadInventory, 
-  saveInventory, 
-  loadRentals, 
-  saveRentals, 
-  exportFullBackupJSON, 
-  importFullBackupJSON,
-  getRentalComputedStatus 
-} from './utils/storage';
+import { getRentalComputedStatus, getNextBookingNumber } from './utils/storage';
+import {
+  fetchCategories,
+  createCategory,
+  updateCategoryDb,
+  deleteCategoryDb,
+  fetchInventory,
+  createInventoryItemDb,
+  updateInventoryItemDb,
+  deleteInventoryItemDb,
+  fetchRentals,
+  createRentalDb,
+  updateRentalDb,
+  deleteRentalDb,
+  exportBackupJSON,
+  importBackupJSON,
+} from './lib/database';
+import { useAuth } from './context/AuthContext';
+import LoginPage from './components/LoginPage';
 
 // Import our modular components
 import Dashboard from './components/Dashboard';
@@ -40,6 +48,8 @@ import RentalsList from './components/RentalsList';
 import Analytics from './components/Analytics';
 
 export default function App() {
+  const { user, loading: authLoading, signOut } = useAuth();
+
   // Tabs: 'dashboard', 'analytics', 'rentals', 'new-rental', 'inventory', 'settings'
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'rentals' | 'new-rental' | 'inventory' | 'settings'>('dashboard');
   
@@ -50,6 +60,10 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [rentals, setRentals] = useState<Rental[]>([]);
+
+  // Data loading state
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isCreatingRental, setIsCreatingRental] = useState(false);
 
   // Time representation
   const [currentTime, setCurrentTime] = useState('');
@@ -74,13 +88,39 @@ export default function App() {
     }
   }, [toast]);
 
-  // Load data on boot
+  // Load data from Supabase when user is authenticated
   useEffect(() => {
-    setCategories(loadCategories());
-    setInventory(loadInventory());
-    setRentals(loadRentals());
+    if (!user) return;
 
-    // Update time clock every second
+    async function loadData() {
+      setIsDataLoading(true);
+      try {
+        const [catResult, invResult, rentalResult] = await Promise.all([
+          fetchCategories(),
+          fetchInventory(),
+          fetchRentals(),
+        ]);
+        if (catResult.data) setCategories(catResult.data);
+        if (invResult.data) setInventory(invResult.data);
+        if (rentalResult.data) setRentals(rentalResult.data);
+
+        if (catResult.error || invResult.error || rentalResult.error) {
+          console.error('Data loading errors:', catResult.error, invResult.error, rentalResult.error);
+          showToast('Some data failed to load. Please refresh the page.', 'error');
+        }
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        showToast('Failed to connect to database. Please check your connection.', 'error');
+      } finally {
+        setIsDataLoading(false);
+      }
+    }
+
+    loadData();
+  }, [user]);
+
+  // Update time clock every second
+  useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
@@ -90,83 +130,131 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Save changes helper functions
-  const handleAddCategory = (name: string) => {
-    const newCat: Category = {
-      id: `cat-${Date.now()}`,
-      name,
-    };
-    const next = [...categories, newCat];
-    setCategories(next);
-    saveCategories(next);
-    showToast(`Category "${name}" created successfully.`, 'success');
+  // ============================================
+  // Category CRUD Handlers (async)
+  // ============================================
+
+  const handleAddCategory = async (name: string) => {
+    const { data, error } = await createCategory(name);
+    if (error) {
+      showToast('Failed to create category. Please try again.', 'error');
+      return;
+    }
+    if (data) {
+      setCategories(prev => [...prev, data]);
+      showToast(`Category "${name}" created successfully.`, 'success');
+    }
   };
 
-  const handleUpdateCategory = (id: string, name: string) => {
-    const next = categories.map(cat => cat.id === id ? { ...cat, name } : cat);
-    setCategories(next);
-    saveCategories(next);
+  const handleUpdateCategory = async (id: string, name: string) => {
+    const { error } = await updateCategoryDb(id, name);
+    if (error) {
+      showToast('Failed to update category.', 'error');
+      return;
+    }
+    setCategories(prev => prev.map(cat => cat.id === id ? { ...cat, name } : cat));
     showToast(`Category updated to "${name}".`, 'success');
   };
 
-  const handleDeleteCategory = (id: string) => {
-    const next = categories.filter(cat => cat.id !== id);
-    setCategories(next);
-    saveCategories(next);
+  const handleDeleteCategory = async (id: string) => {
+    const { error } = await deleteCategoryDb(id);
+    if (error) {
+      showToast('Failed to delete category.', 'error');
+      return;
+    }
+    setCategories(prev => prev.filter(cat => cat.id !== id));
     showToast('Category deleted.', 'info');
   };
 
-  const handleAddInventoryItem = (itemData: Omit<InventoryItem, 'id'>) => {
-    const newItem: InventoryItem = {
-      ...itemData,
-      id: `item-${Date.now()}`,
-    };
-    const next = [newItem, ...inventory];
-    setInventory(next);
-    saveInventory(next);
-    showToast(`Outfit "${itemData.name}" added to stock inventory.`, 'success');
+  // ============================================
+  // Inventory CRUD Handlers (async)
+  // ============================================
+
+  const handleAddInventoryItem = async (itemData: Omit<InventoryItem, 'id'>) => {
+    const { data, error } = await createInventoryItemDb(itemData);
+    if (error) {
+      showToast('Failed to add outfit. Please try again.', 'error');
+      return;
+    }
+    if (data) {
+      setInventory(prev => [data, ...prev]);
+      showToast(`Outfit "${itemData.name}" added to stock inventory.`, 'success');
+    }
   };
 
-  const handleUpdateInventoryItem = (id: string, itemData: Omit<InventoryItem, 'id'>) => {
-    const next = inventory.map(item => item.id === id ? { ...item, ...itemData } : item);
-    setInventory(next);
-    saveInventory(next);
-    showToast(`Outfit "${itemData.name}" stock details saved.`, 'success');
+  const handleUpdateInventoryItem = async (id: string, itemData: Omit<InventoryItem, 'id'>) => {
+    const { data, error } = await updateInventoryItemDb(id, itemData);
+    if (error) {
+      showToast('Failed to update outfit.', 'error');
+      return;
+    }
+    if (data) {
+      setInventory(prev => prev.map(item => item.id === id ? data : item));
+      showToast(`Outfit "${itemData.name}" stock details saved.`, 'success');
+    }
   };
 
-  const handleDeleteInventoryItem = (id: string) => {
-    const next = inventory.filter(item => item.id !== id);
-    setInventory(next);
-    saveInventory(next);
+  const handleDeleteInventoryItem = async (id: string) => {
+    const { error } = await deleteInventoryItemDb(id);
+    if (error) {
+      showToast('Failed to remove outfit.', 'error');
+      return;
+    }
+    setInventory(prev => prev.filter(item => item.id !== id));
     showToast('Outfit removed from stock list.', 'info');
   };
 
-  const handleAddRental = (rentalData: Omit<Rental, 'id' | 'createdAt'>) => {
-    const newRental: Rental = {
-      ...rentalData,
-      id: `rent-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
-    const next = [newRental, ...rentals];
-    setRentals(next);
-    saveRentals(next);
-    
-    // Switch to rentals tab to show new checkout
-    setRentalsFilter('all');
-    setActiveTab('rentals');
-    showToast(`Rental handover registered successfully for customer "${rentalData.customerName}"!`, 'success');
+  // ============================================
+  // Rental CRUD Handlers (async)
+  // ============================================
+
+  const handleAddRental = async (rentalData: Omit<Rental, 'id' | 'createdAt'>) => {
+    setIsCreatingRental(true);
+    showToast('Creating rental slip & uploading photos...', 'info');
+
+    const { data, error } = await createRentalDb(rentalData);
+    setIsCreatingRental(false);
+
+    if (error) {
+      showToast('Failed to create rental. Please try again.', 'error');
+      return;
+    }
+    if (data) {
+      setRentals(prev => [data, ...prev]);
+      setRentalsFilter('all');
+      setActiveTab('rentals');
+      showToast(`Rental handover registered successfully for customer "${rentalData.customerName}"!`, 'success');
+    }
   };
 
-  const handleUpdateRental = (id: string, updatedFields: Partial<Rental>) => {
-    const next = rentals.map(rent => rent.id === id ? { ...rent, ...updatedFields } : rent);
-    setRentals(next);
-    saveRentals(next);
+  const handleUpdateRental = async (id: string, updatedFields: Partial<Rental>) => {
+    // Optimistic update for non-photo fields
+    const { returnPhotos, handoverPhotos, ...safeFields } = updatedFields;
+    if (Object.keys(safeFields).length > 0) {
+      setRentals(prev => prev.map(r => r.id === id ? { ...r, ...safeFields } : r));
+    }
+
+    const { data, error } = await updateRentalDb(id, updatedFields);
+    if (error) {
+      showToast('Failed to save changes. Reverting...', 'error');
+      // Revert by re-fetching
+      const { data: fresh } = await fetchRentals();
+      if (fresh) setRentals(fresh);
+      return;
+    }
+    if (data) {
+      // Replace with server-confirmed data (includes photo URLs)
+      setRentals(prev => prev.map(r => r.id === id ? data : r));
+    }
   };
 
-  const handleDeleteRental = (id: string) => {
-    const next = rentals.filter(rent => rent.id !== id);
-    setRentals(next);
-    saveRentals(next);
+  const handleDeleteRental = async (id: string) => {
+    const { error } = await deleteRentalDb(id);
+    if (error) {
+      showToast('Failed to delete rental.', 'error');
+      return;
+    }
+    setRentals(prev => prev.filter(rent => rent.id !== id));
   };
 
   // Dashboard View Redirection Helper
@@ -175,53 +263,78 @@ export default function App() {
     setActiveTab('rentals');
   };
 
-  // Backup & Restore
-  const handleDownloadBackup = () => {
-    const jsonStr = exportFullBackupJSON();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `fancy_dress_shop_database_backup_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+  // ============================================
+  // Backup & Restore (async)
+  // ============================================
+
+  const handleDownloadBackup = async () => {
+    showToast('Generating database backup...', 'info');
+    try {
+      const jsonStr = await exportBackupJSON();
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cloakroom_database_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('Database backup downloaded successfully!', 'success');
+    } catch {
+      showToast('Failed to generate backup.', 'error');
+    }
   };
 
-  const handleRestoreBackupUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRestoreBackupUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const text = event.target?.result;
       if (typeof text === 'string') {
-        const success = importFullBackupJSON(text);
+        showToast('Restoring database from backup...', 'info');
+        const success = await importBackupJSON(text);
         if (success) {
-          // reload states
-          setCategories(loadCategories());
-          setInventory(loadInventory());
-          setRentals(loadRentals());
+          // Reload all data from Supabase
+          const [catResult, invResult, rentalResult] = await Promise.all([
+            fetchCategories(),
+            fetchInventory(),
+            fetchRentals(),
+          ]);
+          if (catResult.data) setCategories(catResult.data);
+          if (invResult.data) setInventory(invResult.data);
+          if (rentalResult.data) setRentals(rentalResult.data);
           showToast('Database restored successfully! All stock, categories, and rentals have been updated.', 'success');
         } else {
-          showToast('Failed to restore backup. Invalid database format. Please ensure you are uploading a valid backup JSON file.', 'error');
+          showToast('Failed to restore backup. Invalid database format.', 'error');
         }
       }
     };
     reader.readAsText(file);
-    e.target.value = ''; // clear input
+    e.target.value = '';
   };
 
-  const handleResetDemoSeedData = () => {
+  const handleResetDatabase = () => {
     showConfirm(
       'Reset Database',
-      'Are you sure you want to completely RESET the database to original demo seeds? ALL of your custom outfits, categories, and rental bookings will be permanently deleted.',
-      () => {
-        localStorage.clear();
-        // Reload seeds
-        setCategories(loadCategories());
-        setInventory(loadInventory());
-        setRentals(loadRentals());
-        showToast('Database successfully reset to demo values!', 'success');
+      'Are you sure you want to CLEAR the entire database? ALL categories, outfits, and rental records will be permanently deleted. This cannot be undone.',
+      async () => {
+        const success = await importBackupJSON(JSON.stringify({
+          categories: [],
+          inventory_items: [],
+          rentals: [],
+          rental_items: [],
+          additional_items: [],
+          rental_photos: [],
+        }));
+        if (success) {
+          setCategories([]);
+          setInventory([]);
+          setRentals([]);
+          showToast('Database cleared successfully.', 'success');
+        } else {
+          showToast('Failed to clear database.', 'error');
+        }
       }
     );
   };
@@ -229,8 +342,44 @@ export default function App() {
   // Active rentals list (for stock calculating availability)
   const activeBookedRentals = rentals.filter(r => getRentalComputedStatus(r) !== 'returned');
 
+  // ============================================
+  // Auth Gates
+  // ============================================
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-sans neo-bg">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 neo-flat flex items-center justify-center mx-auto text-[var(--color-sky)]">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <div className="w-6 h-6 border-2 border-[var(--color-sky-light)] border-t-[var(--color-sky)] rounded-full animate-spin mx-auto" />
+          <p className="text-[var(--color-navy)] text-sm font-bold">Loading App...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  if (isDataLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-sans neo-bg">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 neo-flat flex items-center justify-center mx-auto text-[var(--color-sky)]">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <div className="w-6 h-6 border-2 border-[var(--color-sky-light)] border-t-[var(--color-sky)] rounded-full animate-spin mx-auto" />
+          <p className="text-[var(--color-navy)] text-sm font-bold">Loading Store Data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans select-none selection:bg-blue-100 pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col font-sans select-none selection:bg-blue-100 pb-16 md:pb-0 neo-bg">
       
       {/* Dynamic Toast Notification */}
       {toast && (
@@ -288,63 +437,59 @@ export default function App() {
       )}
 
       {/* Mobile Compact Header */}
-      <div className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-slate-900 rounded-none flex items-center justify-center shadow-xs shrink-0">
-            <Sparkles className="w-4.5 h-4.5 text-sky-400" />
+      <div className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 neo-flat mx-2 mt-2 rounded-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 neo-pressed flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-[var(--color-sky)]" />
           </div>
           <div>
-            <h1 className="text-xs font-black text-slate-900 tracking-tight uppercase">Ariya Thangam</h1>
-            <p className="text-[9px] text-blue-700 font-extrabold font-mono tracking-wider uppercase">Fancy Dress For Rent</p>
+            <h1 className="text-sm font-black text-[var(--color-navy)] tracking-tight">Ariya Thangam</h1>
+            <p className="text-[10px] text-[var(--color-sky)] font-extrabold font-mono tracking-widest uppercase">Store Operations</p>
           </div>
         </div>
-        <div className="text-right text-xxs font-bold font-mono text-slate-600 bg-slate-100 border border-slate-200/50 px-2 py-1 rounded-none">
+        <div className="text-right text-[10px] font-bold font-mono text-[var(--color-navy)] neo-pressed px-3 py-1.5 rounded-lg">
           {currentTime.split(' ')[0] || '00:00:00'}
         </div>
       </div>
 
       {/* Desktop Visual Header */}
-      <header className="hidden md:block bg-white text-slate-900 relative border-b border-slate-200 shadow-sm">
-        
-        {/* Accent Top Bar */}
-        <div className="h-1 bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 w-full"></div>
-
-        <div className="max-w-7xl mx-auto px-6 py-5 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <header className="hidden md:block neo-flat mx-4 mt-4 p-4 z-20 relative">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Shop branding block with tag design */}
-          <div className="flex items-center gap-4 text-center md:text-left">
-            <div className="w-12 h-12 bg-slate-900 rounded-none flex items-center justify-center shadow-md shrink-0 border border-slate-800">
-              <Sparkles className="w-7 h-7 text-sky-400" />
+          <div className="flex items-center gap-5 text-center md:text-left">
+            <div className="w-14 h-14 neo-pressed flex items-center justify-center shrink-0">
+              <Sparkles className="w-7 h-7 text-[var(--color-sky)]" />
             </div>
             <div>
-              <h1 className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight flex items-center justify-center md:justify-start gap-2">
-                Ariya Thangam Fancy Dress For Rent
-                <span className="text-xxs bg-blue-50 text-blue-800 border border-blue-100 font-bold px-2 py-0.5 rounded-none font-mono uppercase tracking-wider shrink-0">
-                  Cloakroom Counter
+              <h1 className="text-xl lg:text-2xl font-black text-[var(--color-navy)] tracking-tight flex items-center justify-center md:justify-start gap-3">
+                Ariya Thangam
+                <span className="text-xs text-[var(--color-sky)] font-bold px-2 py-1 neo-pressed rounded-lg font-mono uppercase tracking-widest shrink-0">
+                  Operations
                 </span>
               </h1>
-              <p className="text-slate-500 text-sm mt-0.5">
-                Costume Inventory, Client Bookings &amp; Financial Analysis System
+              <p className="text-slate-500 font-medium text-sm mt-1">
+                Store Inventory & Rental Management
               </p>
             </div>
           </div>
 
           {/* Shop counter real-time clock card */}
-          <div className="bg-slate-50 px-4 py-2.5 rounded-none border border-slate-200 flex items-center gap-4 shrink-0 shadow-sm">
-            <div className="space-y-0.5">
-              <span className="block text-xxs uppercase text-slate-400 font-bold tracking-wider">Counter Calendar</span>
-              <span className="text-sm font-bold text-slate-700 flex items-center gap-1.5 font-mono">
-                <Calendar className="w-3.5 h-3.5 text-blue-700" />
+          <div className="neo-pressed px-5 py-3 rounded-2xl flex items-center gap-6 shrink-0">
+            <div className="space-y-1">
+              <span className="block text-[10px] uppercase text-slate-400 font-bold tracking-widest">Today</span>
+              <span className="text-sm font-bold text-[var(--color-navy)] flex items-center gap-2 font-mono">
+                <Calendar className="w-4 h-4 text-[var(--color-sky)]" />
                 {new Date().toISOString().split('T')[0]}
               </span>
             </div>
             
-            <div className="w-[1px] h-8 bg-slate-200"></div>
+            <div className="w-px h-8 bg-slate-300"></div>
             
-            <div className="space-y-0.5">
-              <span className="block text-xxs uppercase text-slate-400 font-bold tracking-wider">System Time</span>
-              <span className="text-sm font-bold text-blue-700 flex items-center gap-1.5 font-mono">
-                <Clock className="w-3.5 h-3.5" />
+            <div className="space-y-1">
+              <span className="block text-[10px] uppercase text-slate-400 font-bold tracking-widest">Time</span>
+              <span className="text-sm font-bold text-[var(--color-navy)] flex items-center gap-2 font-mono">
+                <Clock className="w-4 h-4 text-[var(--color-sky)]" />
                 {currentTime || '00:00:00'}
               </span>
             </div>
@@ -352,16 +497,16 @@ export default function App() {
         </div>
 
         {/* Tab/Ticket Selectors Row */}
-        <div className="bg-slate-50/60 border-t border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none">
-            <nav className="flex gap-2 py-2 px-2">
+        <div className="mt-4 border-t border-[rgba(0,0,0,0.05)] pt-4">
+          <div className="overflow-x-auto scrollbar-none px-2">
+            <nav className="flex gap-4">
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
-                { id: 'analytics', label: 'Analytics & Bills', icon: BarChart3 },
-                { id: 'new-rental', label: 'New Rental Slip', icon: PlusCircle, highlight: true },
-                { id: 'rentals', label: 'Rentals Log', icon: ClipboardList },
-                { id: 'inventory', label: 'Manage Stock', icon: Tag },
-                { id: 'settings', label: 'Backup Hub', icon: Database },
+                { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+                { id: 'new-rental', label: 'New Rental', icon: PlusCircle, highlight: true },
+                { id: 'rentals', label: 'Rentals', icon: ClipboardList },
+                { id: 'inventory', label: 'Inventory', icon: Tag },
+                { id: 'settings', label: 'Settings', icon: Database },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -369,22 +514,19 @@ export default function App() {
                   <button
                     key={tab.id}
                     type="button"
-                    id={`nav-tab-${tab.id}`}
                     onClick={() => {
-                      if (tab.id === 'rentals') {
-                        setRentalsFilter('all'); // reset sub filter when clicking directly
-                      }
+                      if (tab.id === 'rentals') setRentalsFilter('all');
                       setActiveTab(tab.id as any);
                     }}
-                    className={`px-4 py-2.5 rounded-none font-bold text-sm flex items-center gap-2 transition-all shrink-0 cursor-pointer ${
+                    className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2.5 shrink-0 transition-all ${
                       isActive
-                        ? 'bg-slate-900 text-white shadow-md'
+                        ? 'neo-pressed text-[var(--color-navy)]'
                         : tab.highlight
-                        ? 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800'
-                        : 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'
+                        ? 'neo-btn text-[var(--color-sky)]'
+                        : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
                     }`}
                   >
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className="w-4.5 h-4.5 shrink-0" />
                     {tab.label}
                   </button>
                 );
@@ -409,73 +551,71 @@ export default function App() {
               />
 
               {/* Quick Assistant Terminal guide */}
-              <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Info className="w-5.5 h-5.5 text-blue-800" />
-                    How to Handle Rentals on the Counter
+              <div className="neo-flat p-8 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-[var(--color-navy)] flex items-center gap-3">
+                    <Info className="w-6 h-6 text-[var(--color-sky)]" />
+                    Store Operations
                   </h3>
-                  <div className="space-y-3 text-sm text-slate-600">
-                    <p className="leading-relaxed">
-                      This management system is optimized for quick offline counter operation. It tracks costume stock, customer refunds, and handover conditions safely:
+                  <div className="space-y-4 text-sm text-slate-600 font-medium leading-relaxed">
+                    <p>
+                      Track inventory, manage customer rentals, and oversee store operations in real time.
                     </p>
-                    <ul className="space-y-2 list-disc list-inside">
-                      <li><strong>Double Deposit Rule:</strong> We collect rental price + equal refundable deposit upfront for peace of mind.</li>
-                      <li><strong>Photo Reference:</strong> Always snap condition photos during checkout to prevent dispute arguments on returns.</li>
-                      <li><strong>Database Backups:</strong> Download a database JSON file to backup your stock list to a flash drive regularly!</li>
+                    <ul className="space-y-3">
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-sky)]"></div><strong>Security Deposit:</strong> Collect rental price + equal deposit.</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-sky)]"></div><strong>Photo Tracking:</strong> Add photos during checkout.</li>
+                      <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[var(--color-sky)]"></div><strong>Cloud Sync:</strong> All data is securely backed up.</li>
                     </ul>
                   </div>
 
-                  <div className="pt-2 flex gap-3">
+                  <div className="pt-2 flex flex-wrap gap-4">
                     <button
                       type="button"
-                      id="dash-quick-checkout"
                       onClick={() => setActiveTab('new-rental')}
-                      className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-none text-sm shadow-sm transition-colors cursor-pointer"
+                      className="neo-btn-primary px-6 py-3"
                     >
-                      + Start Checkout Slip
+                      + New Rental
                     </button>
                     <button
                       type="button"
-                      id="dash-quick-inventory"
                       onClick={() => setActiveTab('inventory')}
-                      className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-none text-sm transition-colors cursor-pointer"
+                      className="neo-btn px-6 py-3 text-[var(--color-navy)]"
                     >
-                      Adjust Costume Stock
+                      Manage Inventory
                     </button>
                   </div>
                 </div>
 
                 {/* Aesthetic Ticket Receipt Illustration */}
-                <div className="bg-slate-50 border border-slate-200 rounded-none p-6 hidden md:flex flex-col space-y-4">
-                  <span className="font-mono text-xxs uppercase tracking-wider text-slate-400 font-bold">Counter Quick-stats Info</span>
+                <div className="neo-pressed p-8 hidden md:flex flex-col space-y-5">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Store Statistics</span>
                   
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-4 text-sm font-medium">
                     <div className="flex justify-between items-center text-slate-600">
-                      <span className="font-semibold">Total Costumes Catalogued</span>
-                      <span className="font-mono font-bold text-slate-950 bg-white px-2 py-0.5 rounded-none border border-slate-200">
-                        {inventory.length} items
+                      <span>Unique Items</span>
+                      <span className="font-mono font-bold text-[var(--color-navy)] neo-flat px-3 py-1 text-xs">
+                        {inventory.length}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center text-slate-600">
-                      <span className="font-semibold">Total Stock Units in Store</span>
-                      <span className="font-mono font-bold text-slate-950 bg-white px-2 py-0.5 rounded-none border border-slate-200">
+                      <span>Total Stock Volume</span>
+                      <span className="font-mono font-bold text-[var(--color-navy)] neo-flat px-3 py-1 text-xs">
                         {inventory.reduce((sum, item) => sum + item.quantity, 0)} units
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center text-slate-600">
-                      <span className="font-semibold">Total Rented Out Right Now</span>
-                      <span className="font-mono font-bold text-slate-950 bg-white px-2 py-0.5 rounded-none border border-slate-200">
+                      <span>Currently Rented</span>
+                      <span className="font-mono font-bold text-[var(--color-navy)] neo-flat px-3 py-1 text-xs">
                         {activeBookedRentals.reduce((sum, r) => sum + r.items.reduce((s, i) => s + i.quantity, 0), 0)} units
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center text-slate-600">
-                      <span className="font-semibold">Categories Active</span>
-                      <span className="font-mono font-bold text-slate-950 bg-white px-2 py-0.5 rounded-none border border-slate-200">
-                        {categories.length} categories
+                      <span>Item Categories</span>
+                      <span className="font-mono font-bold text-[var(--color-navy)] neo-flat px-3 py-1 text-xs">
+                        {categories.length}
                       </span>
                     </div>
                   </div>
@@ -503,6 +643,7 @@ export default function App() {
               onSave={handleAddRental}
               onCancel={() => setActiveTab('dashboard')}
               onShowToast={showToast}
+              isSubmitting={isCreatingRental}
             />
           )}
 
@@ -540,51 +681,53 @@ export default function App() {
           {/* Settings & Backups */}
           {activeTab === 'settings' && (
             <div className="max-w-3xl mx-auto space-y-6">
-              <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm space-y-6">
+              <div className="neo-flat p-8 space-y-8">
                 
-                <div className="border-b border-slate-100 pb-4">
-                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Database className="w-6 h-6 text-blue-800" />
-                    Database Security &amp; Data Recovery Hub
+                <div className="border-b border-[rgba(0,0,0,0.05)] pb-4">
+                  <h3 className="text-xl font-bold text-[var(--color-navy)] flex items-center gap-2">
+                    <Database className="w-6 h-6 text-[var(--color-sky)]" />
+                    Database & Recovery
                   </h3>
                   <p className="text-slate-500 text-sm mt-1">
-                    Backup or restore all costume catalogs, category structures, and customer rental histories.
+                    Manage system backups, export data, or restore from a previous snapshot.
+                  </p>
+                  <p className="text-xs text-[var(--color-sky)] font-bold mt-2 font-mono uppercase tracking-widest">
+                    Cloud Database · {user?.email}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Export block */}
-                  <div className="bg-slate-50 p-5 rounded-none border border-slate-200 flex flex-col justify-between space-y-4">
+                  <div className="neo-pressed p-6 flex flex-col justify-between space-y-6">
                     <div>
-                      <h4 className="font-bold text-base text-slate-800 flex items-center gap-1.5">
-                        <Download className="w-5 h-5 text-emerald-600" />
-                        Download Database Backup
+                      <h4 className="font-bold text-base text-[var(--color-navy)] flex items-center gap-2">
+                        <Download className="w-5 h-5 text-emerald-500" />
+                        Export Backup
                       </h4>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Saves a single JSON security file containing everything: categories, current stock inventory, condition logs, and historical customer rental receipts.
+                      <p className="text-xs text-slate-500 mt-2 font-medium">
+                        Download a full snapshot of inventory, categories, and active rentals to a local file.
                       </p>
                     </div>
 
                     <button
                       type="button"
-                      id="btn-backup-download"
                       onClick={handleDownloadBackup}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-none text-sm flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                      className="w-full py-3 neo-btn text-[var(--color-navy)] font-bold text-sm flex items-center justify-center gap-2"
                     >
-                      <Download className="w-4.5 h-4.5" />
-                      Save Database File (.json)
+                      <Download className="w-4 h-4" />
+                      Save as .json
                     </button>
                   </div>
 
                   {/* Import block */}
-                  <div className="bg-slate-50 p-5 rounded-none border border-slate-200 flex flex-col justify-between space-y-4">
+                  <div className="neo-pressed p-6 flex flex-col justify-between space-y-6">
                     <div>
-                      <h4 className="font-bold text-base text-slate-800 flex items-center gap-1.5">
-                        <Upload className="w-5 h-5 text-blue-800" />
-                        Restore Database from File
+                      <h4 className="font-bold text-base text-[var(--color-navy)] flex items-center gap-2">
+                        <Upload className="w-5 h-5 text-[var(--color-sky)]" />
+                        Restore Backup
                       </h4>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Upload a previously exported database backup JSON file. <strong>Warning:</strong> This will replace your current counter database.
+                      <p className="text-xs text-slate-500 mt-2 font-medium">
+                        Upload a snapshot to restore data. <strong>Warning:</strong> Replaces current data.
                       </p>
                     </div>
 
@@ -598,36 +741,46 @@ export default function App() {
                       />
                       <button
                         type="button"
-                        id="btn-backup-restore-trigger"
                         onClick={() => document.getElementById('db-restore-upload-input')?.click()}
-                        className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-none text-sm flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                        className="w-full py-3 neo-btn text-[var(--color-navy)] font-bold text-sm flex items-center justify-center gap-2"
                       >
-                        <Upload className="w-4.5 h-4.5" />
-                        Upload Backup (.json)
+                        <Upload className="w-4 h-4" />
+                        Upload .json
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Reset Warning block */}
-                <div className="bg-red-50 border border-red-200 rounded-none p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="neo-pressed p-6 flex flex-col sm:flex-row justify-between items-center gap-6">
                   <div className="space-y-1 text-center sm:text-left">
-                    <h4 className="font-bold text-base text-red-800 flex items-center justify-center sm:justify-start gap-1.5">
+                    <h4 className="font-bold text-base text-red-500 flex items-center justify-center sm:justify-start gap-2">
                       <RotateCcw className="w-5 h-5" />
-                      Danger Zone: Reset Demo Seeds
+                      System Reset
                     </h4>
-                    <p className="text-xs text-red-700">
-                      Wipes the database and loads the original seed data. Good for demonstration/testing on first launch.
+                    <p className="text-xs text-slate-500 font-medium">
+                      Permanently wipes all inventory and active rentals from the system.
                     </p>
                   </div>
 
                   <button
                     type="button"
-                    id="btn-db-reset-demo"
-                    onClick={handleResetDemoSeedData}
-                    className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-none text-sm shadow-sm shrink-0 transition-colors cursor-pointer"
+                    onClick={handleResetDatabase}
+                    className="px-6 py-3 neo-btn text-red-500 font-bold text-sm shrink-0"
                   >
-                    Reset &amp; Seed Demo
+                    Clear All Data
+                  </button>
+                </div>
+
+                {/* Sign Out */}
+                <div className="border-t border-[rgba(0,0,0,0.05)] pt-6">
+                  <button
+                    type="button"
+                    onClick={signOut}
+                    className="w-full py-3 neo-btn text-[var(--color-navy)] font-bold text-sm flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
                   </button>
                 </div>
 
@@ -638,19 +791,19 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer cardboard styling */}
-      <footer className="bg-slate-950 text-slate-400 py-6 border-t border-slate-900 mt-auto mb-16 md:mb-0">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm font-semibold text-center sm:text-left">
-          <p>© 2026 Cloakroom. Running offline on secure local sandbox.</p>
-          <div className="flex gap-4 font-mono text-xs text-slate-500">
-            <span>DATABASE: LOCALSTORAGE</span>
+      {/* Footer */}
+      <footer className="py-6 mt-auto mb-16 md:mb-0 border-t border-[rgba(0,0,0,0.05)]">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm font-semibold text-center sm:text-left text-slate-400">
+          <p>© 2026 Cloakroom Operations</p>
+          <div className="flex gap-4 font-mono text-[10px] tracking-widest uppercase">
+            <span>Powered by Supabase</span>
           </div>
         </div>
       </footer>
 
       {/* Mobile Sticky Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 pb-safe shadow-lg">
-        <nav className="flex justify-around items-center py-2 px-1">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 neo-flat rounded-t-3xl rounded-b-none z-40 pb-safe shadow-lg px-2 pt-2 pb-1">
+        <nav className="flex justify-around items-center">
           {[
             { id: 'dashboard', label: 'Home', icon: TrendingUp },
             { id: 'analytics', label: 'Reports', icon: BarChart3 },
@@ -665,26 +818,20 @@ export default function App() {
               <button
                 key={tab.id}
                 type="button"
-                id={`mobile-nav-tab-${tab.id}`}
                 onClick={() => {
-                  if (tab.id === 'rentals') {
-                    setRentalsFilter('all');
-                  }
+                  if (tab.id === 'rentals') setRentalsFilter('all');
                   setActiveTab(tab.id as any);
                 }}
-                className={`flex flex-col items-center gap-1 py-1 px-2.5 transition-all relative ${
+                className={`flex flex-col items-center gap-1 p-2 transition-all rounded-xl ${
                   isActive 
-                    ? 'text-blue-800 font-extrabold' 
+                    ? 'neo-pressed text-[var(--color-navy)]' 
                     : tab.highlight 
-                    ? 'text-blue-700/80 font-semibold'
-                    : 'text-slate-400 hover:text-slate-700'
+                    ? 'text-[var(--color-sky)] neo-btn'
+                    : 'text-slate-400 hover:text-[var(--color-navy)]'
                 }`}
               >
-                {isActive && (
-                  <span className="absolute top-0 w-8 h-1 bg-slate-900 rounded-full"></span>
-                )}
-                <Icon className={`w-5 h-5 ${tab.highlight && !isActive ? 'scale-110 text-blue-600 animate-pulse' : ''}`} />
-                <span className="text-[9px] font-bold tracking-tight uppercase">
+                <Icon className={`w-5 h-5 ${tab.highlight && !isActive ? 'scale-110' : ''}`} />
+                <span className="text-[9px] font-bold tracking-widest uppercase">
                   {tab.label}
                 </span>
               </button>

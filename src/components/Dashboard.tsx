@@ -46,20 +46,18 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
     <div className="space-y-8 animate-fadeIn pb-12">
       
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-none p-6 md:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-none blur-3xl pointer-events-none"></div>
-        
+      <div className="neo-flat p-8 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-400/20 text-sky-300 px-3 py-1 rounded-none text-xs font-mono font-bold uppercase tracking-wider">
-              <Activity className="w-3.5 h-3.5 text-sky-400" />
-              Live Shop Counter Monitor
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 neo-pressed text-[var(--color-sky)] px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-widest">
+              <Activity className="w-4 h-4" />
+              Live Monitor
             </div>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white">
-              Operations Control Center
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[var(--color-navy)]">
+              Operations Center
             </h2>
-            <p className="text-slate-300 text-xs md:text-sm max-w-2xl leading-relaxed">
-              Real-time monitoring for ongoing costume handovers, return deadlines, overdue items, and counter security deposits.
+            <p className="text-slate-500 font-medium text-sm max-w-2xl leading-relaxed">
+              Real-time monitoring of rentals, returns, and security deposits.
             </p>
           </div>
 
@@ -67,10 +65,10 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
             <button
               type="button"
               onClick={onNavigateToAnalytics}
-              className="self-start md:self-auto flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-3 rounded-none shadow-lg shadow-blue-950/40 transition-all hover:scale-[1.02] cursor-pointer shrink-0 border border-blue-400/30"
+              className="self-start md:self-auto flex items-center gap-2 neo-btn-primary px-6 py-4"
             >
-              <BarChart3 className="w-4 h-4 text-sky-200" />
-              Full Financials & Statements →
+              <BarChart3 className="w-5 h-5 text-white" />
+              Financials & Reports →
             </button>
           )}
         </div>
@@ -81,91 +79,79 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
         
         {/* Active Rentals Card */}
         <div 
-          id="card-active-rentals"
           onClick={() => onViewRentals('active')}
-          className="relative bg-white border border-slate-200 rounded-none p-6 shadow-sm hover:shadow hover:border-blue-400 transition-all cursor-pointer group flex flex-col justify-between overflow-hidden"
+          className="neo-btn p-6 flex flex-col justify-between group h-full text-left"
         >
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-none opacity-60 group-hover:scale-110 transition-transform"></div>
           <div className="relative flex items-start justify-between">
             <div>
-              <p className="text-slate-500 font-bold text-xs uppercase tracking-wider">Active Outfits Out</p>
-              <h3 className="text-5xl font-black text-slate-900 mt-2 font-mono" id="stat-active-count">
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Active Rentals</p>
+              <h3 className="text-5xl font-black text-[var(--color-navy)] mt-4 font-mono">
                 {activeRentals.length}
               </h3>
             </div>
-            <div className="p-3 bg-blue-50 text-blue-700 rounded-none">
+            <div className="p-4 neo-pressed text-[var(--color-sky)]">
               <Calendar className="w-8 h-8" />
             </div>
           </div>
-          <div className="mt-6 pt-3 border-t border-slate-100 flex justify-between items-center">
-            <span className="text-xs font-bold text-blue-700 group-hover:text-blue-800 group-hover:underline">View Active List</span>
-            <span className="text-xxs text-blue-800 bg-blue-50 px-2.5 py-1 rounded-none font-black uppercase tracking-wider">In-Field</span>
+          <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center">
+            <span className="text-xs font-bold text-[var(--color-navy)] group-hover:text-[var(--color-sky)] transition-colors">View Active</span>
+            <span className="text-[10px] text-[var(--color-sky)] neo-pressed px-3 py-1.5 font-bold uppercase tracking-widest">On Rent</span>
           </div>
         </div>
 
         {/* Overdue Rentals Card */}
         <div 
-          id="card-overdue-rentals"
           onClick={() => onViewRentals('overdue')}
-          className={`relative bg-white border rounded-none p-6 shadow-sm hover:shadow transition-all cursor-pointer group flex flex-col justify-between overflow-hidden ${
-            overdueRentals.length > 0 
-              ? 'border-red-200 hover:border-red-300' 
-              : 'border-slate-200 hover:border-slate-300'
-          }`}
+          className={`p-6 flex flex-col justify-between group h-full text-left transition-all ${overdueRentals.length > 0 ? 'neo-flat ring-2 ring-red-400 cursor-pointer' : 'neo-btn'}`}
         >
           {overdueRentals.length > 0 && (
-            <div className="absolute top-0 right-0 p-2 bg-red-600 text-white font-bold text-xxs uppercase rounded-none tracking-wider">
-              Action Needed
+            <div className="absolute top-4 right-4 px-3 py-1 bg-red-500 text-white font-bold text-[10px] uppercase rounded-full shadow-lg tracking-widest animate-pulse">
+              Attention
             </div>
           )}
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-red-50 rounded-none opacity-40 group-hover:scale-110 transition-transform"></div>
           <div className="relative flex items-start justify-between">
             <div>
-              <p className="text-slate-500 font-bold text-xs uppercase tracking-wider">Overdue Returns</p>
-              <h3 className={`text-5xl font-black mt-2 font-mono ${overdueRentals.length > 0 ? 'text-red-600' : 'text-slate-900'}`} id="stat-overdue-count">
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Overdue</p>
+              <h3 className={`text-5xl font-black mt-4 font-mono ${overdueRentals.length > 0 ? 'text-red-500' : 'text-[var(--color-navy)]'}`}>
                 {overdueRentals.length}
               </h3>
             </div>
-            <div className={`p-3 rounded-none ${overdueRentals.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-600'}`}>
+            <div className={`p-4 neo-pressed ${overdueRentals.length > 0 ? 'text-red-500' : 'text-slate-400'}`}>
               <AlertCircle className="w-8 h-8" />
             </div>
           </div>
-          <div className="mt-6 pt-3 border-t border-slate-100 flex justify-between items-center">
-            <span className={`text-xs font-bold group-hover:underline ${overdueRentals.length > 0 ? 'text-red-600' : 'text-slate-600'}`}>
-              View Overdue List
+          <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center">
+            <span className={`text-xs font-bold transition-colors ${overdueRentals.length > 0 ? 'text-red-500 group-hover:text-red-600' : 'text-slate-500 group-hover:text-[var(--color-navy)]'}`}>
+              View Overdue
             </span>
             {overdueRentals.length > 0 ? (
-              <span className="text-xxs bg-red-600 text-white px-2.5 py-1 rounded-none font-black uppercase tracking-wider flex items-center gap-1">
-                <ShieldAlert className="w-3.5 h-3.5" /> Overdue
+              <span className="text-[10px] bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest flex items-center gap-1">
+                <ShieldAlert className="w-3.5 h-3.5" /> Action Req
               </span>
             ) : (
-              <span className="text-xxs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-none font-bold">All Clear</span>
+              <span className="text-[10px] text-slate-500 neo-pressed px-3 py-1.5 font-bold uppercase tracking-widest">Clear</span>
             )}
           </div>
         </div>
 
         {/* Security Deposits Held Card */}
-        <div 
-          id="card-pending-advances"
-          className="relative bg-white border border-slate-200 rounded-none p-6 shadow-sm hover:shadow hover:border-emerald-300 transition-all group flex flex-col justify-between overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-50 rounded-none opacity-60 transition-transform"></div>
+        <div className="neo-flat p-6 flex flex-col justify-between h-full text-left">
           <div className="relative flex items-start justify-between">
             <div>
-              <p className="text-slate-500 font-bold text-xs uppercase tracking-wider">Active Deposits Held</p>
-              <h3 className="text-5xl font-black text-emerald-600 mt-2 font-mono flex items-center" id="stat-advance-total">
-                <IndianRupee className="w-9 h-9 -mr-1 shrink-0 text-emerald-500" />
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Active Deposits</p>
+              <h3 className="text-5xl font-black text-emerald-500 mt-4 font-mono flex items-center">
+                <IndianRupee className="w-8 h-8 -mr-1 shrink-0 text-emerald-400" />
                 {totalPendingAdvance}
               </h3>
             </div>
-            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-none">
+            <div className="p-4 neo-pressed text-emerald-500">
               <ShieldCheck className="w-8 h-8" />
             </div>
           </div>
-          <div className="mt-6 pt-3 border-t border-slate-100 flex justify-between items-center text-slate-600">
-            <span className="text-xs font-bold text-emerald-600">Counter Safe Deposit</span>
-            <span className="text-xxs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-none font-bold uppercase">
-              Total Safe: ₹{totalActiveDeposits}
+          <div className="mt-8 pt-4 border-t border-[rgba(0,0,0,0.05)] flex justify-between items-center text-slate-600">
+            <span className="text-xs font-bold text-emerald-500">Held in Safe</span>
+            <span className="text-[10px] neo-pressed text-emerald-600 px-3 py-1.5 font-bold uppercase tracking-widest">
+              Total: ₹{totalActiveDeposits}
             </span>
           </div>
         </div>
@@ -173,55 +159,55 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
       </div>
 
       {/* --- RECENT ACTIVE HANDOVERS SECTION --- */}
-      <div className="bg-white border border-slate-200 rounded-none p-6 md:p-8 shadow-sm space-y-5">
+      <div className="neo-flat p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-blue-800" />
-              Active Outfit Handover Log
+            <h3 className="text-xl font-bold text-[var(--color-navy)] flex items-center gap-3">
+              <ClipboardList className="w-6 h-6 text-[var(--color-sky)]" />
+              Recent Rentals
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Quick operational overview of items currently out with customers</p>
+            <p className="text-sm font-medium text-slate-500 mt-2">Latest items handed out to customers.</p>
           </div>
           <button
             type="button"
             onClick={() => onViewRentals('active')}
-            className="text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+            className="text-sm font-bold text-[var(--color-navy)] hover:text-[var(--color-sky)] flex items-center gap-2 transition-colors neo-btn px-4 py-2"
           >
-            See All Active ({activeRentals.length}) <ArrowUpRight className="w-3.5 h-3.5" />
+            View All ({activeRentals.length}) <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>
 
         {recentActiveRentals.length > 0 ? (
-          <div className="divide-y divide-slate-100">
+          <div className="space-y-4">
             {recentActiveRentals.map(r => {
               const status = getRentalComputedStatus(r);
               const isOverdue = status === 'overdue';
               return (
-                <div key={r.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 px-3 rounded-none transition-colors">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm">{r.customerName}</span>
-                      <span className="text-xxs font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-none">
-                        #{r.id.slice(-6).toUpperCase()}
+                <div key={r.id} className="neo-pressed p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-[var(--color-navy)] text-base">{r.customerName}</span>
+                      <span className="text-[10px] font-mono font-bold neo-flat text-slate-500 px-3 py-1 rounded-lg uppercase tracking-widest">
+                        #{r.id.slice(-6)}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm font-medium text-slate-600">
                       {r.items.map(i => `${i.name} (${i.quantity}x)`).join(', ')}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-6 text-sm">
                     <div className="text-right">
-                      <span className="text-slate-400 text-[10px] font-bold block uppercase">Expected Return</span>
-                      <span className={`font-mono font-bold ${isOverdue ? 'text-red-600' : 'text-slate-700'}`}>
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase tracking-widest mb-1">Expected Return</span>
+                      <span className={`font-mono font-bold ${isOverdue ? 'text-red-500' : 'text-slate-700'}`}>
                         {r.expectedReturnDate}
                       </span>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-none text-xxs font-black uppercase font-mono ${
-                      isOverdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-800'
+                    <span className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest neo-flat ${
+                      isOverdue ? 'text-red-500 ring-1 ring-red-400' : 'text-[var(--color-sky)]'
                     }`}>
-                      {isOverdue ? 'OVERDUE' : 'ACTIVE'}
+                      {isOverdue ? 'Overdue' : 'Active'}
                     </span>
                   </div>
                 </div>
@@ -229,8 +215,8 @@ export default function Dashboard({ rentals, onViewRentals, onNavigateToAnalytic
             })}
           </div>
         ) : (
-          <div className="py-8 text-center text-slate-400 text-xs font-bold">
-            No active costume rentals currently out on field.
+          <div className="py-12 neo-pressed text-center text-slate-400 text-sm font-bold uppercase tracking-widest">
+            No active rentals currently.
           </div>
         )}
       </div>
