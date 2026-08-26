@@ -38,8 +38,8 @@ export default function CustomerDetailsSection({
       <div className="neo-flat p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[rgba(0,0,0,0.05)] pb-6">
           <div>
-            <span className="text-[10px] font-bold text-[var(--color-sky)] block uppercase tracking-widest font-mono">
-              01. Order Type
+            <span className="text-[20px] font-bold text-[var(--color-sky)] block uppercase tracking-widest font-mono">
+              Order Type
             </span>
             <p className="text-sm font-medium text-slate-500 mt-2">
               Select order type. Stock automatically updates based on chosen dates.
@@ -56,11 +56,10 @@ export default function CustomerDetailsSection({
                   setAdvanceAmount(rentalCharge);
                 }
               }}
-              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${
-                !isPreBooking
-                  ? 'neo-pressed text-[var(--color-navy)]'
-                  : 'neo-btn text-slate-500'
-              }`}
+              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${!isPreBooking
+                ? 'neo-pressed text-[var(--color-navy)]'
+                : 'neo-btn text-slate-500'
+                }`}
             >
               <Clock className="w-4 h-4" />
               Direct Handover
@@ -75,11 +74,10 @@ export default function CustomerDetailsSection({
                   setAdvanceAmount(Math.max(0, rentalCharge - toPaise(200)));
                 }
               }}
-              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${
-                isPreBooking
-                  ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
-                  : 'neo-btn text-slate-500'
-              }`}
+              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${isPreBooking
+                ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
+                : 'neo-btn text-slate-500'
+                }`}
             >
               <BookmarkCheck className="w-4 h-4" />
               Pre-Booking
@@ -130,8 +128,8 @@ export default function CustomerDetailsSection({
 
       {/* 1. Customer Information Ticket Card */}
       <div className="neo-flat p-8 relative">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
-          02. Customer Info
+        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+          Customer Info
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
@@ -158,7 +156,7 @@ export default function CustomerDetailsSection({
               className="w-full neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
             />
           </div>
-          
+
           <div className="sm:col-span-2">
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Address (Optional)</label>
             <textarea

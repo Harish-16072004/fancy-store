@@ -37,8 +37,8 @@ export default function ItemsSelectionSection({
     <>
       {/* 2. Costume Inventory Select Ticket Card */}
       <div className="neo-flat p-8 relative space-y-6">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
-          03. Items
+        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+          Items
         </div>
 
         {/* Date Conflict Warning Banner if dates changed after selecting */}
@@ -95,11 +95,10 @@ export default function ItemsSelectionSection({
               const bookedRentalsCount = getItemBookedRentals(item.id, rentalsList).length;
 
               return (
-                <div 
-                  key={item.id} 
-                  className={`p-4 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                    selectedQty > 0 ? 'neo-flat ring-2 ring-[var(--color-sky)]' : 'neo-btn'
-                  }`}
+                <div
+                  key={item.id}
+                  className={`p-4 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${selectedQty > 0 ? 'neo-flat ring-2 ring-[var(--color-sky)]' : 'neo-btn'
+                    }`}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -119,15 +118,14 @@ export default function ItemsSelectionSection({
                       <span className="text-slate-500">{cat?.name}</span>
                       <span className="text-slate-500">Size {item.size}</span>
                       <span className="text-emerald-500 font-mono">{formatINR(item.rentalPrice)}/d</span>
-                      
+
                       <span
-                        className={`px-3 py-1 neo-pressed ${
-                          remaining <= 0
-                            ? 'text-red-500'
-                            : remaining < totalStoreStock
+                        className={`px-3 py-1 neo-pressed ${remaining <= 0
+                          ? 'text-red-500'
+                          : remaining < totalStoreStock
                             ? 'text-amber-500'
                             : 'text-emerald-500'
-                        }`}
+                          }`}
                       >
                         Avail {remaining}/{totalStoreStock}
                       </span>
@@ -159,11 +157,10 @@ export default function ItemsSelectionSection({
                         type="button"
                         onClick={() => handleAddCostume(item.id)}
                         disabled={remaining <= 0}
-                        className={`px-5 py-2.5 font-bold text-[10px] tracking-widest uppercase transition-all cursor-pointer ${
-                          remaining <= 0
-                            ? 'neo-pressed text-slate-400 cursor-not-allowed'
-                            : 'neo-btn text-[var(--color-navy)]'
-                        }`}
+                        className={`px-5 py-2.5 font-bold text-[10px] tracking-widest uppercase transition-all cursor-pointer ${remaining <= 0
+                          ? 'neo-pressed text-slate-400 cursor-not-allowed'
+                          : 'neo-btn text-[var(--color-navy)]'
+                          }`}
                       >
                         {remaining <= 0 ? 'Out' : 'Select'}
                       </button>
@@ -177,8 +174,8 @@ export default function ItemsSelectionSection({
 
       {/* 3. Repeatable Additional Accessories Card */}
       <div className="neo-flat p-8 relative space-y-6">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
-          04. Accessories
+        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+          Accessories
         </div>
 
         <p className="text-xs font-medium text-slate-500 mt-2">

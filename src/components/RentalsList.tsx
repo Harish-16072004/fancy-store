@@ -382,8 +382,8 @@ export default function RentalsList({
                 <CameraCapture
                   photos={returnPhotos}
                   onChange={setReturnPhotos}
-                  label="Take Photos"
-                  maxPhotos={5}
+                  label="Attach Return Photos"
+                  maxPhotos={2}
                 />
               </div>
             </div>

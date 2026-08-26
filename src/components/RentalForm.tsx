@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Save, 
-  Trash2, 
-  Plus, 
-  MinusCircle, 
-  PlusCircle, 
+import {
+  Save,
+  Trash2,
+  Plus,
+  MinusCircle,
+  PlusCircle,
   Notebook,
   Calendar,
   Clock,
@@ -49,7 +49,7 @@ export default function RentalForm({
   isSubmitting = false
 }: RentalFormProps) {
   const rentalsList = existingRentals || activeRentals || [];
-  const handleSave = onSaveRental || onSave || (() => {});
+  const handleSave = onSaveRental || onSave || (() => { });
 
   // Customer Details
   const [customerName, setCustomerName] = useState('');
@@ -287,7 +287,7 @@ export default function RentalForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn pb-12">
-      
+
       {/* Schedule / Timeline Inspection Modal */}
       {inspectScheduleItem && (
         <CostumeScheduleModal
@@ -312,7 +312,7 @@ export default function RentalForm({
           </div>
           <h2 className="text-3xl font-black text-[var(--color-navy)] tracking-tight">Issue Slip</h2>
         </div>
-        
+
         {onCancel && (
           <button
             type="button"
@@ -348,7 +348,7 @@ export default function RentalForm({
             setCustomerAddress={setCustomerAddress}
           />
 
-      <ItemsSelectionSection
+          <ItemsSelectionSection
             inventory={inventory}
             categories={categories}
             rentalsList={rentalsList}
@@ -374,7 +374,7 @@ export default function RentalForm({
 
           {/* Checkout Invoice Box */}
           <div className="neo-pressed p-8 relative">
-            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-white font-bold px-4 py-1 text-[10px] uppercase tracking-widest font-mono">
+            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
               Slip Summary
             </div>
 
@@ -534,8 +534,8 @@ export default function RentalForm({
                     <>
                       <Save className="w-5 h-5" />
                       {isPreBooking
-                        ? `Save Pre-Booking ({formatINR(preBookingPaid)})`
-                        : `Complete Handover ({formatINR(totalUpfront)})`}
+                        ? 'Save Pre-Booking'
+                        : 'Complete Handover'}
                     </>
                   )}
                 </button>
@@ -546,15 +546,15 @@ export default function RentalForm({
           {/* Handover Camera condition photos */}
           <div className="neo-flat p-8">
             <div className="mb-4">
-              <span className="text-[10px] font-bold text-[var(--color-sky)] uppercase tracking-widest font-mono">
-                05. Condition Photos
+              <span className="text-[15px] font-bold text-[var(--color-sky)] uppercase tracking-widest font-mono">
+                Condition Photos
               </span>
             </div>
             <CameraCapture
               photos={issuePhotos}
               onChange={setIssuePhotos}
               label="Attach Handover Photos"
-              maxPhotos={5}
+              maxPhotos={2}
             />
           </div>
 
