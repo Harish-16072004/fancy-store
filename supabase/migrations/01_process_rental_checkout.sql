@@ -1,6 +1,9 @@
 CREATE OR REPLACE FUNCTION process_rental_checkout(
   payload JSONB
-) RETURNS UUID AS $$
+) RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
 DECLARE
   v_rental_id UUID;
   v_item JSONB;
@@ -17,15 +20,15 @@ BEGIN
     payload->>'customer_name',
     payload->>'customer_phone',
     payload->>'customer_address',
-    payload->>'date_given',
-    payload->>'expected_return_date',
-    payload->>'actual_return_date',
-    payload->>'status',
-    (payload->>'is_pre_booking')::BOOLEAN,
-    COALESCE((payload->>'pre_booking_paid')::INTEGER, 0),
-    (payload->>'rental_charge')::INTEGER,
-    (payload->>'advance_amount')::INTEGER,
-    (payload->>'advance_returned')::BOOLEAN,
+    (payload->>'date_given')::DATE,
+    (payload->>'expected_return_date')::DATE,
+    NULLIF(payload->>'actual_return_date', '')::DATE,
+    COALESCE(payload->>'status', 'active'),
+    COALESCE((payload->>'is_pre_booking')::BOOLEAN, false),
+    COALESCE((payload->>'pre_booking_paid')::NUMERIC, 0),
+    COALESCE((payload->>'rental_charge')::NUMERIC, 0),
+    COALESCE((payload->>'advance_amount')::NUMERIC, 0),
+    COALESCE((payload->>'advance_returned')::BOOLEAN, false),
     payload->>'notes'
   ) RETURNING id INTO v_rental_id;
 
@@ -39,10 +42,10 @@ BEGIN
         v_rental_id,
         CASE WHEN (v_item->>'item_id') IS NULL OR (v_item->>'item_id') = '' THEN NULL ELSE (v_item->>'item_id')::UUID END,
         v_item->>'name',
-        v_item->>'category_name',
-        v_item->>'size',
-        (v_item->>'quantity')::INTEGER,
-        (v_item->>'rental_price')::INTEGER
+        COALESCE(v_item->>'category_name', 'Costumes'),
+        COALESCE(v_item->>'size', 'M'),
+        COALESCE((v_item->>'quantity')::INTEGER, 1),
+        COALESCE((v_item->>'rental_price')::NUMERIC, 0)
       );
     END LOOP;
   END IF;
@@ -56,11 +59,11 @@ BEGIN
       ) VALUES (
         v_rental_id,
         v_add_item->>'name',
-        (v_add_item->>'quantity')::INTEGER
+        COALESCE((v_add_item->>'quantity')::INTEGER, 1)
       );
     END LOOP;
   END IF;
 
   RETURN v_rental_id;
 END;
-$$ LANGUAGE plpgsql;
+$$;

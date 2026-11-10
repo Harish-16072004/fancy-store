@@ -276,7 +276,8 @@ export default function App() {
     setIsCreatingRental(false);
 
     if (error) {
-      showToast('Failed to create rental. Please try again.', 'error');
+      console.error('Error creating rental:', error);
+      showToast(error.message || 'Failed to create rental. Please try again.', 'error');
       return;
     }
     if (data) {
@@ -572,7 +573,7 @@ const isActive = activeTab === targetPath;
       </header>
 
       {/* Main Counter Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <div className="animate-fadeIn">
 
           {/* Dashboard View */}

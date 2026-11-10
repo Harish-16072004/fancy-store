@@ -244,7 +244,7 @@ export default function InventoryManager({
       {activeTab === 'items' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch md:items-center neo-flat p-6">
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-stretch md:items-center neo-flat p-4 sm:p-6">
             {/* Search */}
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-sky)]" />
@@ -263,7 +263,7 @@ export default function InventoryManager({
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] transition-all"
+                className="w-full md:w-auto px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] transition-all"
               >
                 <option value="all">All Categories</option>
                 {categories.map((cat) => (
@@ -275,11 +275,11 @@ export default function InventoryManager({
             </div>
 
             {/* Add New Costume Button */}
-            <div className="flex gap-4 shrink-0">
+            <div className="grid grid-cols-2 sm:flex gap-3 sm:gap-4 shrink-0">
               <button
                 type="button"
                 onClick={handleExportInventoryExcel}
-                className="px-6 py-3 neo-btn text-emerald-500 hover:text-emerald-600 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="px-4 sm:px-6 py-3 neo-btn text-emerald-500 hover:text-emerald-600 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer"
                 title="Export Costume Inventory list"
               >
                 <FileDown className="w-5 h-5" />
@@ -289,7 +289,7 @@ export default function InventoryManager({
               <button
                 type="button"
                 onClick={openAddItemForm}
-                className="px-6 py-3 neo-btn-primary font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+                className="px-4 sm:px-6 py-3 neo-btn-primary font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
                 Add Outfit
@@ -435,25 +435,25 @@ export default function InventoryManager({
       )}
 
       {activeTab === 'categories' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* Add Category Form */}
-          <div className="p-8 neo-flat space-y-4">
+          <div className="p-4 sm:p-8 neo-flat space-y-4">
             <h4 className="text-xl font-black text-[var(--color-navy)]">New Category</h4>
             <p className="text-slate-500 text-sm font-medium">
               Create a custom section to group similar items (e.g. Superheroes, Historical).
             </p>
 
-            <form onSubmit={handleCatSubmit} className="flex gap-4">
+            <form onSubmit={handleCatSubmit} className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 placeholder="e.g. Traditional Costumes"
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
-                className="flex-1 px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
+                className="w-full sm:flex-1 min-w-0 px-4 py-3 neo-pressed text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
               <button
                 type="submit"
-                className="px-6 py-3 neo-btn-primary font-bold text-xs flex items-center gap-2 uppercase tracking-widest cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 neo-btn-primary font-bold text-xs flex items-center justify-center gap-2 uppercase tracking-widest cursor-pointer shrink-0"
               >
                 <Plus className="w-5 h-5" /> Add
               </button>
@@ -461,10 +461,10 @@ export default function InventoryManager({
           </div>
 
           {/* Categories List */}
-          <div className="p-8 neo-flat space-y-6">
+          <div className="p-4 sm:p-8 neo-flat space-y-6">
             <h4 className="text-xl font-black text-[var(--color-navy)]">Categories</h4>
 
-            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 hide-scrollbar">
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1 hide-scrollbar">
               {categories.map((cat) => {
                 const count = inventory.filter((item) => item.categoryId === cat.id).length;
                 const isEditing = editingCatId === cat.id;

@@ -300,7 +300,7 @@ export default function RentalForm({
       )}
 
       {/* Header Bar */}
-      <div className="neo-flat p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="neo-flat p-4 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-sky)] font-bold">
@@ -310,14 +310,14 @@ export default function RentalForm({
               <Hash className="w-3 h-3" /> Booking #{nextBookingNum}
             </span>
           </div>
-          <h2 className="text-3xl font-black text-[var(--color-navy)] tracking-tight">Issue Slip</h2>
+          <h2 className="text-2xl sm:text-3xl font-black text-[var(--color-navy)] tracking-tight">Issue Slip</h2>
         </div>
 
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 neo-btn text-slate-500 font-bold text-sm shrink-0 hover:text-[var(--color-navy)]"
+            className="w-full sm:w-auto px-6 py-3 neo-btn text-slate-500 font-bold text-sm shrink-0 hover:text-[var(--color-navy)] text-center cursor-pointer"
           >
             Cancel
           </button>
@@ -325,7 +325,7 @@ export default function RentalForm({
       </div>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         {/* LEFT COLUMN */}
         <div className="lg:col-span-7 space-y-8">
           <CustomerDetailsSection
@@ -373,8 +373,8 @@ export default function RentalForm({
         <div className="lg:col-span-5 space-y-6">
 
           {/* Checkout Invoice Box */}
-          <div className="neo-pressed p-8 relative">
-            <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+          <div className="neo-pressed p-4 sm:p-8 relative">
+            <div className="absolute top-0 left-4 sm:left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[13px] sm:text-[15px] uppercase tracking-widest font-mono">
               Slip Summary
             </div>
 
@@ -419,7 +419,7 @@ export default function RentalForm({
 
               {/* Financial Charges Input */}
               <div className="space-y-6 pt-4 border-t border-[rgba(0,0,0,0.05)]">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Rent (₹)</label>
                     <input
@@ -440,7 +440,7 @@ export default function RentalForm({
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                      {isPreBooking ? 'Deposit (-{formatINR(toPaise(200))})' : 'Deposit (₹)'}
+                      {isPreBooking ? `Deposit (-${formatINR(toPaise(200))})` : 'Deposit (₹)'}
                     </label>
                     <input
                       type="number"
@@ -544,7 +544,7 @@ export default function RentalForm({
           </div>
 
           {/* Handover Camera condition photos */}
-          <div className="neo-flat p-8">
+          <div className="neo-flat p-4 sm:p-8">
             <div className="mb-4">
               <span className="text-[15px] font-bold text-[var(--color-sky)] uppercase tracking-widest font-mono">
                 Condition Photos

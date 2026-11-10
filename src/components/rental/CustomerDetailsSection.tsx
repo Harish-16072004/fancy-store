@@ -35,18 +35,18 @@ export default function CustomerDetailsSection({
   return (
     <>
       {/* 00. Booking Mode & Rotation Date Range Configuration */}
-      <div className="neo-flat p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[rgba(0,0,0,0.05)] pb-6">
+      <div className="neo-flat p-4 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 border-b border-[rgba(0,0,0,0.05)] pb-4 sm:pb-6">
           <div>
-            <span className="text-[20px] font-bold text-[var(--color-sky)] block uppercase tracking-widest font-mono">
+            <span className="text-lg sm:text-[20px] font-bold text-[var(--color-sky)] block uppercase tracking-widest font-mono">
               Order Type
             </span>
-            <p className="text-sm font-medium text-slate-500 mt-2">
+            <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1 sm:mt-2">
               Select order type. Stock automatically updates based on chosen dates.
             </p>
           </div>
 
-          <div className="flex gap-4 shrink-0">
+          <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-4 w-full sm:w-auto shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -56,13 +56,13 @@ export default function CustomerDetailsSection({
                   setAdvanceAmount(rentalCharge);
                 }
               }}
-              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${!isPreBooking
+              className={`px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${!isPreBooking
                 ? 'neo-pressed text-[var(--color-navy)]'
                 : 'neo-btn text-slate-500'
                 }`}
             >
-              <Clock className="w-4 h-4" />
-              Direct Handover
+              <Clock className="w-4 h-4 shrink-0" />
+              <span>Direct Handover</span>
             </button>
 
             <button
@@ -74,19 +74,19 @@ export default function CustomerDetailsSection({
                   setAdvanceAmount(Math.max(0, rentalCharge - toPaise(200)));
                 }
               }}
-              className={`px-5 py-3 text-sm font-bold flex items-center gap-2 transition-all ${isPreBooking
+              className={`px-3 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${isPreBooking
                 ? 'neo-pressed text-amber-500 ring-1 ring-amber-400'
                 : 'neo-btn text-slate-500'
                 }`}
             >
-              <BookmarkCheck className="w-4 h-4" />
-              Pre-Booking
+              <BookmarkCheck className="w-4 h-4 shrink-0" />
+              <span>Pre-Booking</span>
             </button>
           </div>
         </div>
 
         {/* Date Range Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 items-center">
           <div className="md:col-span-5">
             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[var(--color-sky)]" />
@@ -104,7 +104,7 @@ export default function CustomerDetailsSection({
           <div className="md:col-span-2 flex flex-col items-center justify-center text-center py-2">
             <span className="text-[10px] uppercase font-mono font-bold text-slate-400 tracking-widest">Duration</span>
             <div className="text-xs font-bold font-mono text-[var(--color-sky)] neo-pressed px-3 py-1.5 mt-2 flex items-center gap-2">
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 hidden md:inline" />
               {rentalDurationDays} Day{rentalDurationDays !== 1 ? 's' : ''}
             </div>
           </div>
@@ -127,8 +127,8 @@ export default function CustomerDetailsSection({
       </div>
 
       {/* 1. Customer Information Ticket Card */}
-      <div className="neo-flat p-8 relative">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+      <div className="neo-flat p-4 sm:p-8 relative">
+        <div className="absolute top-0 left-4 sm:left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[13px] sm:text-[15px] uppercase tracking-widest font-mono">
           Customer Info
         </div>
 

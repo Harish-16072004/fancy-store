@@ -36,8 +36,8 @@ export default function ItemsSelectionSection({
   return (
     <>
       {/* 2. Costume Inventory Select Ticket Card */}
-      <div className="neo-flat p-8 relative space-y-6">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+      <div className="neo-flat p-4 sm:p-8 relative space-y-6">
+        <div className="absolute top-0 left-4 sm:left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[13px] sm:text-[15px] uppercase tracking-widest font-mono">
           Items
         </div>
 
@@ -58,7 +58,7 @@ export default function ItemsSelectionSection({
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4">
           <input
             type="text"
             placeholder="Search..."
@@ -173,8 +173,8 @@ export default function ItemsSelectionSection({
       </div>
 
       {/* 3. Repeatable Additional Accessories Card */}
-      <div className="neo-flat p-8 relative space-y-6">
-        <div className="absolute top-0 left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[15px] uppercase tracking-widest font-mono">
+      <div className="neo-flat p-4 sm:p-8 relative space-y-6">
+        <div className="absolute top-0 left-4 sm:left-8 -translate-y-1/2 neo-flat bg-[var(--color-navy)] text-[var(--color-sky)] font-bold px-4 py-1 text-[13px] sm:text-[15px] uppercase tracking-widest font-mono">
           Accessories
         </div>
 
@@ -182,21 +182,21 @@ export default function ItemsSelectionSection({
           Add extra custom elements (props, belts, caps).
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {additionalItems.map((item, idx) => (
-            <div key={idx} className="flex gap-4 items-center">
+            <div key={idx} className="flex gap-2 sm:gap-4 items-center">
               <input
                 type="text"
                 placeholder="E.g. Extra sword, Belt"
                 value={item.name}
                 onChange={(e) => updateAdditionalItem(idx, 'name', e.target.value)}
-                className="flex-1 neo-pressed px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
+                className="flex-1 min-w-0 neo-pressed px-3 sm:px-4 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)]"
               />
-              <div className="w-24 shrink-0 flex items-center neo-pressed p-1">
+              <div className="w-20 sm:w-24 shrink-0 flex items-center neo-pressed p-1">
                 <button
                   type="button"
                   onClick={() => updateAdditionalItem(idx, 'quantity', Math.max(1, item.quantity - 1))}
-                  className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-lg"
+                  className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-base sm:text-lg cursor-pointer"
                 >
                   -
                 </button>
@@ -210,7 +210,7 @@ export default function ItemsSelectionSection({
                 <button
                   type="button"
                   onClick={() => updateAdditionalItem(idx, 'quantity', item.quantity + 1)}
-                  className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-lg"
+                  className="px-2 py-1 text-slate-400 hover:text-[var(--color-navy)] font-bold text-base sm:text-lg cursor-pointer"
                 >
                   +
                 </button>
@@ -218,9 +218,9 @@ export default function ItemsSelectionSection({
               <button
                 type="button"
                 onClick={() => removeAdditionalItemField(idx)}
-                className="p-3 neo-btn text-red-500 shrink-0"
+                className="p-2.5 sm:p-3 neo-btn text-red-500 shrink-0 cursor-pointer"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           ))}
