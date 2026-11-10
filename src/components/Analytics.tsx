@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  ResponsiveContainer, 
-  Cell, 
-  AreaChart, 
-  Area 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  AreaChart,
+  Area
 } from 'recharts';
-import { 
-  TrendingUp, 
-  Calendar, 
-  FileText, 
-  Award, 
-  Download, 
-  Flame, 
-  BarChart3, 
-  Shirt, 
-  ArrowUpRight, 
-  ShieldCheck, 
-  CheckCircle, 
-  Activity, 
-  Percent, 
-  IndianRupee 
+import {
+  TrendingUp,
+  Calendar,
+  FileText,
+  Award,
+  Download,
+  Flame,
+  BarChart3,
+  Shirt,
+  ArrowUpRight,
+  ShieldCheck,
+  CheckCircle,
+  Activity,
+  Percent,
+  IndianRupee
 } from 'lucide-react';
 import { InventoryItem, Rental } from '../types';
 import { formatINR } from '../utils/money';
@@ -183,11 +183,11 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
   return (
     <div className="space-y-8 animate-fadeIn pb-12">
-      
+
       {/* Header Banner */}
       <div className="neo-flat p-8 relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-[var(--color-sky)] opacity-10 rounded-full blur-3xl pointer-events-none"></div>
-        
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 neo-pressed text-[var(--color-navy)] px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider">
@@ -215,7 +215,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
       {/* --- SECTION 1: ALL FINANCIAL METRIC KPI CARDS --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
+
         {/* Total Booked Revenue */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
@@ -292,7 +292,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
       {/* --- SECTION 2: PEAK INSIGHT HIGHLIGHT CARDS --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* Peak Season Card */}
         <div className="neo-flat p-6 relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
@@ -361,7 +361,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
       {/* --- SECTION 3: CHARTS (PEAK MONTHS & TOP DRESSES) --- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         {/* Peak Season Area Chart (7 Cols) */}
         <div className="neo-flat p-8 lg:col-span-7 flex flex-col justify-between">
           <div className="mb-8">
@@ -383,13 +383,13 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                 <AreaChart data={monthlyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0}/>
+                      <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
                     formatter={(value: any) => [`${formatINR(value)}`, 'Revenue']}
                   />
@@ -425,7 +425,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                 <BarChart data={outfitChartData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                   <XAxis type="number" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} />
                   <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#102A43', fontWeight: 800 }} width={100} axisLine={false} tickLine={false} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#ebf1f5', borderRadius: '16px', color: '#102A43', border: '1px solid rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold', boxShadow: '5px 5px 10px #c8cdd1, -5px -5px 10px #ffffff' }}
                     formatter={(val: any, name: any, item: any) => [`${val} times (${formatINR(item.payload.revenue)})`, 'Usage']}
                   />
@@ -448,7 +448,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
 
       {/* --- SECTION 4: STATEMENT GENERATOR FOR CUSTOM PERIODS & BILLS --- */}
       <div className="neo-flat p-8 space-y-8">
-        
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[rgba(0,0,0,0.05)] pb-6">
           <div>
             <div className="flex items-center gap-3">
@@ -475,11 +475,10 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
                 key={tab.id}
                 type="button"
                 onClick={() => setDateRangeFilter(tab.id as any)}
-                className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
-                  dateRangeFilter === tab.id
+                className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${dateRangeFilter === tab.id
                     ? 'neo-pressed text-[var(--color-sky)]'
                     : 'neo-btn text-slate-500 hover:text-[var(--color-navy)]'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -539,7 +538,7 @@ export default function Analytics({ rentals, inventory, onShowToast }: Analytics
             className="flex items-center gap-3 neo-btn-primary font-bold text-xs px-8 py-4 uppercase tracking-widest cursor-pointer"
           >
             <Download className="w-5 h-5" />
-            Download PDF Statement ({periodRentals.length})
+            Download PDF Statements
           </button>
         </div>
 

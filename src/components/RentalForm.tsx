@@ -124,7 +124,7 @@ export default function RentalForm({
 
     if (!isAdvanceManuallyEdited) {
       // For Advance Pre-Booking: refundable deposit is automatically (rent charge - 200)
-      setAdvanceAmount(isPreBooking ? Math.max(0, autoCharge - 200) : autoCharge);
+      setAdvanceAmount(isPreBooking ? Math.max(0, autoCharge - toPaise(200)) : autoCharge);
     }
   }, [selectedItems, inventory, isAdvanceManuallyEdited, isPreBooking]);
 
@@ -428,10 +428,10 @@ export default function RentalForm({
                       min="0"
                       value={rentalCharge ? toRupees(rentalCharge) : ""}
                       onChange={(e) => {
-                        const newRent = parseInt(e.target.value) || 0;
+                        const newRent = toPaise(e.target.value);
                         setRentalCharge(newRent);
                         if (!isAdvanceManuallyEdited) {
-                          setAdvanceAmount(isPreBooking ? Math.max(0, newRent - 200) : newRent);
+                          setAdvanceAmount(isPreBooking ? Math.max(0, newRent - toPaise(200)) : newRent);
                         }
                       }}
                       className="w-full neo-flat px-4 py-3 text-sm font-bold text-[var(--color-sky)] font-mono focus:outline-none"
@@ -449,7 +449,7 @@ export default function RentalForm({
                       value={advanceAmount ? toRupees(advanceAmount) : ""}
                       onChange={(e) => {
                         setIsAdvanceManuallyEdited(true);
-                        setAdvanceAmount(parseInt(e.target.value) || 0);
+                        setAdvanceAmount(toPaise(e.target.value));
                       }}
                       className="w-full neo-flat px-4 py-3 text-sm font-bold text-emerald-500 font-mono focus:outline-none"
                     />
@@ -471,7 +471,7 @@ export default function RentalForm({
                       min="0"
                       placeholder="200"
                       value={preBookingPaid ? toRupees(preBookingPaid) : ""}
-                      onChange={(e) => setPreBookingPaid(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setPreBookingPaid(toPaise(e.target.value))}
                       className="w-full neo-pressed px-4 py-3 text-base font-extrabold text-amber-600 font-mono focus:outline-none"
                     />
                   </div>

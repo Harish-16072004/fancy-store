@@ -6,6 +6,7 @@ import CostumeScheduleModal from './CostumeScheduleModal';
 import InventoryItemForm from './inventory/InventoryItemForm';
 import * as XLSX from 'xlsx';
 import { toPaise, toRupees, formatINR } from '../utils/money';
+import { sanitizeSpreadsheetRow } from '../utils/exportSanitizer';
 
 interface InventoryManagerProps {
   categories: Category[];
@@ -50,13 +51,13 @@ export default function InventoryManager({
   const handleExportInventoryExcel = () => {
     const dataRows = inventory.map((item) => {
       const category = categories.find((c) => c.id === item.categoryId);
-      return {
+      return sanitizeSpreadsheetRow({
         'Costume Name': item.name,
         'Category': category ? category.name : 'Unknown',
         'Size': item.size,
         'Stock Quantity': item.quantity,
         'Rental Price (₹)': toRupees(item.rentalPrice),
-      };
+      });
     });
 
     const worksheet = XLSX.utils.json_to_sheet(dataRows);
@@ -114,6 +115,18 @@ export default function InventoryManager({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        alert('Unsupported format. Only JPG, PNG, and WebP images are allowed.', 'error');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image exceeds the maximum allowed size of 5 MB.', 'error');
+        e.target.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {

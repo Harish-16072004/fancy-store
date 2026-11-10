@@ -156,7 +156,7 @@ export default function InventoryItemForm({
               <div className="w-full sm:flex-1">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={handlePhotoUpload}
                   className="hidden"
                   id="file-item-photo"

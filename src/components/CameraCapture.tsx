@@ -98,13 +98,33 @@ export default function CameraCapture({
     const files = e.target.files;
     if (!files) return;
 
+    setCameraError(null);
+    const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    const validFiles: File[] = [];
+    for (const file of Array.from(files) as File[]) {
+      if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        setCameraError(`File "${file.name}" has an unsupported format. Only JPG, PNG, and WebP are allowed.`);
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setCameraError(`File "${file.name}" exceeds the maximum allowed size of 5 MB.`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
     const remainingSlots = maxPhotos - photos.length;
-    const filesToProcess: File[] = (Array.from(files) as File[]).slice(0, remainingSlots);
+    const filesToProcess: File[] = validFiles.slice(0, remainingSlots);
 
     let newPhotos = [...photos];
     let loadedCount = 0;
 
-    if (filesToProcess.length === 0) return;
+    if (filesToProcess.length === 0) {
+      e.target.value = '';
+      return;
+    }
 
     filesToProcess.forEach((file: File) => {
       const reader = new FileReader();
@@ -176,7 +196,7 @@ export default function CameraCapture({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             multiple
             className="hidden"
             onChange={handleFileUpload}

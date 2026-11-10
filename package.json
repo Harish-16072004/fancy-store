@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev": "vite --port=3000",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port=3000",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
@@ -24,7 +24,7 @@
     "react-router-dom": "^7.18.2",
     "recharts": "^3.10.1",
     "vite": "^6.2.3",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import { Rental, Category, InventoryItem } from '../types';
 import { toPaise, toRupees, formatINR } from '../utils/money';
 import { getRentalComputedStatus } from '../utils/storage';
 import { generateRentalInvoicePDF } from '../utils/pdfGenerator';
+import { sanitizeSpreadsheetRow, sanitizeSpreadsheetText } from '../utils/exportSanitizer';
 import CameraCapture from './CameraCapture';
 import * as XLSX from 'xlsx';
 
@@ -92,14 +93,14 @@ export default function RentalsList({
     const dataRows = listToExport.map((r) => {
       const computed = getRentalComputedStatus(r);
       const outfitSummary = r.items
-        .map((item) => `${item.name} [Size: ${item.size}, Qty: ${item.quantity}, Price: ${formatINR(item.rentalPrice)}]`)
+        .map((item) => `${sanitizeSpreadsheetText(item.name)} [Size: ${item.size}, Qty: ${item.quantity}, Price: ${formatINR(item.rentalPrice)}]`)
         .join('; ');
 
       const accessorySummary = r.additionalItems
-        .map((ai) => `${ai.name} (Qty: ${ai.quantity})`)
+        .map((ai) => `${sanitizeSpreadsheetText(ai.name)} (Qty: ${ai.quantity})`)
         .join(', ');
 
-      return {
+      return sanitizeSpreadsheetRow({
         'Booking Number': r.bookingNumber || 'BK-1000',
         'Customer Name': r.customerName,
         'Phone Number': r.customerPhone,
@@ -116,7 +117,7 @@ export default function RentalsList({
         'Remaining Balance Due (₹)': toRupees((r.rentalCharge + r.advanceAmount) - (r.preBookingPaid || 0)),
         'Advance Deposit Returned': r.advanceReturned ? 'YES (Refunded)' : 'NO (Held)',
         'Handover Notes': r.notes || '',
-      };
+      });
     });
 
     const worksheet = XLSX.utils.json_to_sheet(dataRows);
@@ -463,7 +464,7 @@ export default function RentalsList({
                 required
                 min="0"
                 value={editCharge ? toRupees(editCharge) : ""}
-                onChange={(e) => setEditCharge(parseInt(e.target.value) || 0)}
+                onChange={(e) => setEditCharge(toPaise(e.target.value))}
                 className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-[var(--color-sky)]"
               />
             </div>
@@ -497,7 +498,7 @@ export default function RentalsList({
                 required
                 min="0"
                 value={editAdvance ? toRupees(editAdvance) : ""}
-                onChange={(e) => setEditAdvance(parseInt(e.target.value) || 0)}
+                onChange={(e) => setEditAdvance(toPaise(e.target.value))}
                 className="w-full px-4 py-3 neo-pressed text-sm font-bold font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-sky)] text-emerald-500"
               />
             </div>
@@ -508,7 +509,7 @@ export default function RentalsList({
                 type="number"
                 min="0"
                 value={editPreBookingPaid ? toRupees(editPreBookingPaid) : ""}
-                onChange={(e) => setEditPreBookingPaid(parseInt(e.target.value) || 0)}
+                onChange={(e) => setEditPreBookingPaid(toPaise(e.target.value))}
                 className="w-full px-4 py-3 neo-pressed ring-1 ring-amber-400 text-sm font-bold font-mono text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
             </div>

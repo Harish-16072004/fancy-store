@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { uploadPhoto, getPhotoUrl } from './storage-bucket';
+import { uploadPhoto, getPhotoUrl, getSignedPhotoUrl, getSignedPhotoUrls } from './storage-bucket';
 import type { Category, InventoryItem, Rental, RentalItem, AdditionalItemInput } from '../types';
 
 // ============================================
@@ -61,6 +61,9 @@ export async function fetchInventory(): Promise<{ data: InventoryItem[] | null; 
 
   if (error) return { data: null, error };
 
+  const photoPaths = (data || []).map((r: any) => r.photo_path).filter(Boolean);
+  const signedMap = await getSignedPhotoUrls(photoPaths);
+
   const items: InventoryItem[] = (data || []).map(row => ({
     id: row.id,
     name: row.name,
@@ -68,7 +71,7 @@ export async function fetchInventory(): Promise<{ data: InventoryItem[] | null; 
     size: row.size,
     quantity: row.quantity,
     rentalPrice: Number(row.rental_price),
-    photo: row.photo_path ? getPhotoUrl(row.photo_path) : undefined,
+    photo: row.photo_path ? (signedMap[row.photo_path] || getPhotoUrl(row.photo_path)) : undefined,
   }));
 
   return { data: items, error: null };
@@ -99,6 +102,8 @@ export async function createInventoryItemDb(
 
   if (error) return { data: null, error };
 
+  const signedPhoto = data.photo_path ? (await getSignedPhotoUrl(data.photo_path) || getPhotoUrl(data.photo_path)) : undefined;
+
   return {
     data: {
       id: data.id,
@@ -107,7 +112,7 @@ export async function createInventoryItemDb(
       size: data.size,
       quantity: data.quantity,
       rentalPrice: Number(data.rental_price),
-      photo: data.photo_path ? getPhotoUrl(data.photo_path) : undefined,
+      photo: signedPhoto,
     },
     error: null,
   };
@@ -145,6 +150,8 @@ export async function updateInventoryItemDb(
 
   if (error) return { data: null, error };
 
+  const signedPhoto = data.photo_path ? (await getSignedPhotoUrl(data.photo_path) || getPhotoUrl(data.photo_path)) : undefined;
+
   return {
     data: {
       id: data.id,
@@ -153,7 +160,7 @@ export async function updateInventoryItemDb(
       size: data.size,
       quantity: data.quantity,
       rentalPrice: Number(data.rental_price),
-      photo: data.photo_path ? getPhotoUrl(data.photo_path) : undefined,
+      photo: signedPhoto,
     },
     error: null,
   };
@@ -172,14 +179,14 @@ export async function deleteInventoryItemDb(id: string): Promise<{ error: any }>
 // ============================================
 
 /** Map a raw Supabase row (with nested joins) back to the app's Rental type */
-function mapDbRentalToRental(dbRental: any): Rental {
+function mapDbRentalToRental(dbRental: any, signedMap: Record<string, string> = {}): Rental {
   const handoverPhotos = (dbRental.rental_photos || [])
     .filter((p: any) => p.photo_type === 'handover')
-    .map((p: any) => getPhotoUrl(p.photo_path));
+    .map((p: any) => signedMap[p.photo_path] || getPhotoUrl(p.photo_path));
 
   const returnPhotos = (dbRental.rental_photos || [])
     .filter((p: any) => p.photo_type === 'return')
-    .map((p: any) => getPhotoUrl(p.photo_path));
+    .map((p: any) => signedMap[p.photo_path] || getPhotoUrl(p.photo_path));
 
   return {
     id: dbRental.id,
@@ -231,7 +238,16 @@ export async function fetchRentals(page: number = 1, pageSize: number = 50): Pro
     .range(from, to);
 
   if (error) return { data: null, error };
-  return { data: (data || []).map(mapDbRentalToRental), error: null };
+
+  const allPhotoPaths: string[] = [];
+  (data || []).forEach((r: any) => {
+    (r.rental_photos || []).forEach((p: any) => {
+      if (p.photo_path) allPhotoPaths.push(p.photo_path);
+    });
+  });
+
+  const signedMap = await getSignedPhotoUrls(allPhotoPaths);
+  return { data: (data || []).map(r => mapDbRentalToRental(r, signedMap)), error: null };
 }
 
 export async function fetchRentalById(id: string): Promise<{ data: Rental | null; error: any }> {
@@ -247,7 +263,10 @@ export async function fetchRentalById(id: string): Promise<{ data: Rental | null
     .single();
 
   if (error) return { data: null, error };
-  return { data: mapDbRentalToRental(data), error: null };
+
+  const allPhotoPaths: string[] = (data.rental_photos || []).map((p: any) => p.photo_path).filter(Boolean);
+  const signedMap = await getSignedPhotoUrls(allPhotoPaths);
+  return { data: mapDbRentalToRental(data, signedMap), error: null };
 }
 
 export async function createRentalDb(
@@ -283,78 +302,15 @@ export async function createRentalDb(
     })) : [],
   };
 
-  let rentalId: string | null = null;
+  // 2. Execute the atomic transaction via RPC
+  const { data: rentalId, error: rpcError } = await supabase.rpc('process_rental_checkout', { payload });
 
-  // 2. Try the atomic transaction via RPC first
-  try {
-    const { data: rpcRentalId, error: rpcError } = await supabase.rpc('process_rental_checkout', { payload });
-    if (!rpcError && rpcRentalId) {
-      rentalId = rpcRentalId;
-    } else {
-      console.warn('RPC process_rental_checkout failed, falling back to direct database insertion:', rpcError);
-    }
-  } catch (err) {
-    console.warn('RPC process_rental_checkout call error, falling back to direct insertion:', err);
+  if (rpcError || !rentalId) {
+    console.error('process_rental_checkout RPC error:', rpcError);
+    return { data: null, error: rpcError };
   }
 
-  // 3. Fallback to direct client insertion if RPC failed or is not available
-  if (!rentalId) {
-    const { data: rental, error: rentalError } = await supabase
-      .from('rentals')
-      .insert({
-        booking_number: rentalData.bookingNumber,
-        customer_name: rentalData.customerName,
-        customer_phone: rentalData.customerPhone,
-        customer_address: rentalData.customerAddress || null,
-        date_given: rentalData.dateGiven,
-        expected_return_date: rentalData.expectedReturnDate,
-        actual_return_date: rentalData.actualReturnDate || null,
-        status: rentalData.status,
-        is_pre_booking: rentalData.isPreBooking || false,
-        pre_booking_paid: rentalData.preBookingPaid || 0,
-        rental_charge: rentalData.rentalCharge,
-        advance_amount: rentalData.advanceAmount,
-        advance_returned: rentalData.advanceReturned || false,
-        notes: rentalData.notes || null,
-      })
-      .select('id')
-      .single();
-
-    if (rentalError || !rental) {
-      console.error('Direct rental insert failed:', rentalError);
-      return { data: null, error: rentalError };
-    }
-
-    rentalId = rental.id;
-
-    // Direct insert line items
-    if (rentalData.items && rentalData.items.length > 0) {
-      const itemRows = rentalData.items.map(item => ({
-        rental_id: rentalId,
-        item_id: item.itemId || null,
-        name: item.name,
-        category_name: item.categoryName,
-        size: item.size,
-        quantity: item.quantity,
-        rental_price: item.rentalPrice,
-      }));
-      const { error: itemsErr } = await supabase.from('rental_items').insert(itemRows);
-      if (itemsErr) console.error('Error inserting rental items:', itemsErr);
-    }
-
-    // Direct insert additional accessories
-    if (rentalData.additionalItems && rentalData.additionalItems.length > 0) {
-      const addRows = rentalData.additionalItems.map(ai => ({
-        rental_id: rentalId,
-        name: ai.name,
-        quantity: ai.quantity,
-      }));
-      const { error: addErr } = await supabase.from('additional_items').insert(addRows);
-      if (addErr) console.error('Error inserting additional items:', addErr);
-    }
-  }
-
-  // 4. Upload handover photos to storage & insert photo records
+  // 3. Upload handover photos to storage & insert photo records
   if (rentalData.handoverPhotos && rentalData.handoverPhotos.length > 0) {
     for (const photo of rentalData.handoverPhotos) {
       if (photo.startsWith('data:')) {
@@ -370,8 +326,8 @@ export async function createRentalDb(
     }
   }
 
-  // 5. Return the complete rental with all nested data
-  return fetchRentalById(rentalId!);
+  // 4. Return the complete rental with all nested data
+  return fetchRentalById(rentalId);
 }
 
 export async function updateRentalDb(
@@ -483,37 +439,20 @@ export async function exportBackupJSON(): Promise<string> {
 export async function importBackupJSON(jsonString: string): Promise<boolean> {
   try {
     const parsed = JSON.parse(jsonString);
-    if (!parsed.categories || !parsed.inventory_items || !parsed.rentals) {
+    if (
+      !parsed ||
+      !Array.isArray(parsed.categories) ||
+      !Array.isArray(parsed.inventory_items) ||
+      !Array.isArray(parsed.rentals)
+    ) {
       return false;
     }
 
-    // Clear all existing data via the RPC function
-    const { error: clearErr } = await supabase.rpc('clear_all_data');
-    if (clearErr) {
-      console.error('Failed to clear data:', clearErr);
+    const { data, error } = await supabase.rpc('restore_backup_json', { backup: parsed });
+    if (error || !data) {
+      console.error('Atomic backup restore failed:', error);
       return false;
     }
-
-    // Re-insert in FK-safe order
-    if (parsed.categories.length > 0) {
-      await supabase.from('categories').insert(parsed.categories);
-    }
-    if (parsed.inventory_items.length > 0) {
-      await supabase.from('inventory_items').insert(parsed.inventory_items);
-    }
-    if (parsed.rentals.length > 0) {
-      await supabase.from('rentals').insert(parsed.rentals);
-    }
-    if (parsed.rental_items?.length > 0) {
-      await supabase.from('rental_items').insert(parsed.rental_items);
-    }
-    if (parsed.additional_items?.length > 0) {
-      await supabase.from('additional_items').insert(parsed.additional_items);
-    }
-    if (parsed.rental_photos?.length > 0) {
-      await supabase.from('rental_photos').insert(parsed.rental_photos);
-    }
-
     return true;
   } catch (e) {
     console.error('Failed to import backup:', e);

@@ -1,34 +1,48 @@
 -- ============================================
--- Supabase Storage Setup
--- Run this in the Supabase SQL Editor AFTER schema.sql
+-- Supabase Storage Setup (Hardened & Private)
+-- Ariya Thangam Fancy Store
 -- ============================================
 
--- Create the 'photos' storage bucket (public = true for URL-based image display)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('photos', 'photos', true)
-ON CONFLICT (id) DO NOTHING;
+-- 1. Create or update the 'photos' storage bucket to private with 5 MB limit and strict image MIME allowlist
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'photos',
+  'photos',
+  false,
+  5242880,
+  ARRAY['image/jpeg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE
+SET public = false,
+    file_size_limit = 5242880,
+    allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp'];
 
--- Allow authenticated users to upload files to the photos bucket
-CREATE POLICY "Authenticated users can upload photos"
+-- 2. Drop old permissive and public policies
+DROP POLICY IF EXISTS "Public can view photos" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can upload photos" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can view photos" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can update photos" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users can delete photos" ON storage.objects;
+
+-- 3. Enforce active staff authentication on storage operations
+CREATE POLICY "Active staff can upload photos"
 ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'photos');
+WITH CHECK (
+  bucket_id = 'photos'
+  AND public.is_active_staff()
+  AND (storage.foldername(name))[1] IN ('inventory', 'rentals')
+);
 
--- Allow authenticated users to view/read files
-CREATE POLICY "Authenticated users can view photos"
+CREATE POLICY "Active staff can view photos"
 ON storage.objects FOR SELECT TO authenticated
-USING (bucket_id = 'photos');
+USING (
+  bucket_id = 'photos'
+  AND public.is_active_staff()
+);
 
--- Allow authenticated users to update (overwrite) files
-CREATE POLICY "Authenticated users can update photos"
-ON storage.objects FOR UPDATE TO authenticated
-USING (bucket_id = 'photos');
-
--- Allow authenticated users to delete files
-CREATE POLICY "Authenticated users can delete photos"
+CREATE POLICY "Active staff can delete photos"
 ON storage.objects FOR DELETE TO authenticated
-USING (bucket_id = 'photos');
-
--- Allow public read access (since bucket is public, anyone with URL can view)
-CREATE POLICY "Public can view photos"
-ON storage.objects FOR SELECT TO anon
-USING (bucket_id = 'photos');
+USING (
+  bucket_id = 'photos'
+  AND public.is_active_staff()
+);
